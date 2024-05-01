@@ -1,46 +1,41 @@
+require 'active_record'
 require 'awesome_annotate'
 require 'thor'
-require 'active_record'
 
 module AwesomeAnnotate
   class CLI < Thor
-    desc "annotate", "annotate your code"
-    def annotate
-      puts "annotate your code"
-      return 'annotate your code'
-      # AwesomeAnnotate::Annotator.new.annotate
-    end
+    include Thor::Actions
 
     desc 'model [model name]', 'annotate your model'
     def model(model_name)
-      options = {}
-      OptionParser.new do |opts|
-        opts.on("-pPATH", "--path=PATH", "Path to the Rails application") do |path|
-          options[:path] = path
-        end
-      end.parse!
+      rails_env_file = Pathname.new('./config/environment.rb')
+      abort "Rails application path is required" unless rails_env_file.exist?
 
-      # abort "Rails application path is required" unless options[:path]
-      options[:path] = Dir.pwd unless options[:path]
-      p options[:path]
-      require File.join(options[:path], 'config', 'environment.rb')
+      apply rails_env_file.to_s
 
       name = model_name.singularize.camelize
       klass = Object.const_get(name)
 
-      puts 'This is not a model' unless klass < ActiveRecord::Base
+      puts 'This model does not inherit activerecord' unless klass < ActiveRecord::Base
 
       column_names = klass.column_names
-      model_dir = 'app/models'
-      file_path = "#{model_dir}/#{model_name}.rb"
-      file_arr = File.open(file_path).readlines
-      file_arr.unshift("# Columns: #{column_names.join(', ')}")
-      File.open(file_path, 'w') do |file|
-        file_arr.each do |line|
-          file.puts line
-        end
+      model_dir = Pathname.new('app/models')
+      file_path = "#{model_dir.to_s}/#{model_name}.rb"
+      puts "Model file not found" unless File.exist?(file_path)
+      insert_into_file file_path, :before => / class #{klass} \n|class #{klass} .*\n / do
+        "# Columns: #{column_names.join(', ')}\n"
       end
-      puts 'annotate your model'
+      puts "annotate #{model_name.pluralize} table columns in #{file_path}"
+    end
+
+    private
+
+    def self.exit_on_failure?
+      true
+    end
+
+    def self.source_root
+      Dir.pwd
     end
   end
 end
