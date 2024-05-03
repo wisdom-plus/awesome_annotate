@@ -1,5 +1,14 @@
 ## [Unreleased]
 
-## [0.1.0] - 2024-03-31
+## [0.1.0] - 2024-04-29
 
 - Initial release
+
+## [0.1.1] - 2024-05-02
+
+- Fixed a bug
+
+## [0.1.2] - 2024-05-03
+
+- Add a new feature
+  - --version flag
