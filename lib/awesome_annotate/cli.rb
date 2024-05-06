@@ -1,5 +1,6 @@
 require 'awesome_annotate'
 require 'awesome_annotate/model'
+require 'awesome_annotate/route'
 require 'awesome_annotate/version'
 require 'thor'
 
@@ -16,6 +17,11 @@ module AwesomeAnnotate
     desc 'model [model_name]', 'annotate your model'
     def model(model_name)
       AwesomeAnnotate::Model.new.annotate(model_name)
+    end
+
+    desc 'routes', 'annotate your route'
+    def routes
+      AwesomeAnnotate::Route.new.annotate
     end
 
     private
