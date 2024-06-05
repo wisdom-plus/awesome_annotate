@@ -14,12 +14,14 @@ module AwesomeAnnotate
       say AwesomeAnnotate::VERSION
     end
 
+    map %w[model -m] => :model
     desc 'model [model_name]', 'annotate your model'
     def model(model_name)
       AwesomeAnnotate::Model.new.annotate(model_name)
     end
 
-    desc 'routes', 'annotate your route'
+    map %w[routes -r] => :routes
+    desc 'routes', "Writes application route information to `config/routes.rb`."
     def routes
       AwesomeAnnotate::Route.new.annotate
     end
