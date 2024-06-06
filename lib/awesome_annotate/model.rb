@@ -34,7 +34,7 @@ module AwesomeAnnotate
     end
 
     def insert_file_before_class(file_path, klass, message)
-      insert_into_file file_path, :before => / class #{klass} \n|class #{klass} .*\n / do
+      insert_into_file file_path, :before => /^class\s+\w+\s+<\s+\w+/ do
         message
       end
     end
