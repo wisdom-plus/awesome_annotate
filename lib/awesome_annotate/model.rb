@@ -1,15 +1,22 @@
 require 'active_record'
 require 'thor'
+require_relative 'error'
 
 module AwesomeAnnotate
   class Model < Thor
     include Thor::Actions
 
+    def initialize(params = {})
+      super()
+      @env_file_path = Pathname.new(params[:env_file_path] || 'config/environment.rb')
+      @model_dir = Pathname.new(params[:model_dir] || 'app/models')
+    end
+
     desc 'model [model name]', 'annotate your model'
     def annotate(model_name)
-      abort "Rails application path is required" unless env_file_path.exist?
+      raise "Rails application path is required" unless @env_file_path.exist?
 
-      apply env_file_path.to_s
+      apply @env_file_path.to_s
 
       klass = klass_name(model_name)
 
@@ -24,10 +31,6 @@ module AwesomeAnnotate
     end
 
     private
-
-    def env_file_path
-      Pathname.new('config/environment.rb')
-    end
 
     def model_dir
       Pathname.new('app/models')
@@ -44,10 +47,11 @@ module AwesomeAnnotate
     end
 
     def model_file_path(model_name)
-      file_path = "#{model_dir}/#{model_name}.rb"
+      file_path = "#{@model_dir}/#{model_name}.rb"
 
       unless File.exist?(file_path)
-        return say "Model file not found"
+        say "Model file not found"
+        raise NotFoundError
       end
 
       return file_path
@@ -55,10 +59,11 @@ module AwesomeAnnotate
 
     def klass_name(model_name)
       name = model_name.singularize.camelize
-      klass = Object.const_get(name)
+      return Object.const_get(name)
 
     rescue NameError
       say "Model not found"
+      raise NotFoundError
     end
 
     def self.source_root
