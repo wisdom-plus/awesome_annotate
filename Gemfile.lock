@@ -1,8 +1,8 @@
 PATH
   remote: .
   specs:
-    awesome_annotate (0.1.0)
-      activerecord (~> 7.1)
+    awesome_annotate (0.1.4)
+      activerecord (>= 6.1.0)
       thor
 
 GEM

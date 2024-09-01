@@ -5,11 +5,17 @@ module AwesomeAnnotate
   class Route < Thor
     include Thor::Actions
 
+    def initialize(params = {})
+      super()
+      @env_file_path = Pathname.new(params[:env_file_path] || 'config/environment.rb')
+      @route_file_path = Pathname.new(params[:route_file_path] || 'config/routes.rb')
+    end
+
     desc 'annotate all routes', 'annotate your routes'
     def annotate
-      abort "Rails application path is required" unless env_file_path.exist?
+      raise "Rails application path is required" unless @env_file_path.exist?
 
-      apply env_file_path.to_s
+      apply @env_file_path.to_s
 
       inspector = ActionDispatch::Routing::RoutesInspector.new(Rails.application.routes.routes)
       formatter = ActionDispatch::Routing::ConsoleFormatter::Sheet.new
@@ -17,20 +23,14 @@ module AwesomeAnnotate
       routes = inspector.format(formatter, {})
       route_message = parse_routes(routes)
 
-      insert_file_before_class(route_file_path, route_message)
+      raise "Route file not found" unless @route_file_path.exist?
 
-      say "annotate routes in #{route_file_path}"
+      insert_file_before_class(@route_file_path, route_message)
+
+      say "annotate routes in #{@route_file_path}"
     end
 
     private
-
-    def env_file_path
-      Pathname.new('config/environment.rb')
-    end
-
-    def route_file_path
-      Pathname.new('config/routes.rb')
-    end
 
     def parse_routes(routes)
       split_routes = routes.split(/\r\n|\r|\n/)

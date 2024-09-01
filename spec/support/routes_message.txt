@@ -1,0 +1,4 @@
+                                   Prefix Verb       URI Pattern                                                                                       Controller#Action
+                                     root GET        /                                                                                                 home#top
+                           private_policy GET        /private_policy(.:format)                                                                         home#private_policy
+                                   policy GET        /policy(.:format)                                                                                 home#policy
