@@ -15,7 +15,7 @@ module AwesomeAnnotate
     def annotate
       raise "Rails application path is required" unless @env_file_path.exist?
 
-      apply @env_file_path.to_s
+      load_rails_environment
 
       inspector = ActionDispatch::Routing::RoutesInspector.new(Rails.application.routes.routes)
       formatter = ActionDispatch::Routing::ConsoleFormatter::Sheet.new
@@ -31,6 +31,10 @@ module AwesomeAnnotate
     end
 
     private
+
+    def load_rails_environment
+      require @env_file_path.expand_path.to_s
+    end
 
     def parse_routes(routes)
       split_routes = routes.split(/\r\n|\r|\n/)

@@ -16,7 +16,7 @@ module AwesomeAnnotate
     def annotate(model_name)
       raise "Rails application path is required" unless @env_file_path.exist?
 
-      apply @env_file_path.to_s
+      load_rails_environment
 
       klass = klass_name(model_name)
 
@@ -31,6 +31,10 @@ module AwesomeAnnotate
     end
 
     private
+
+    def load_rails_environment
+      require @env_file_path.expand_path.to_s
+    end
 
     def model_dir
       Pathname.new('app/models')
