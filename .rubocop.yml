@@ -8,7 +8,6 @@ AllCops:
     - 'vendor/**/*'
     - 'spec/fixtures/**/*'
     - 'tmp/**/*'
-    - 'spec/integration/**/*'
   NewCops: enable
 
 Style/Documentation:
@@ -41,6 +40,10 @@ RSpec/HooksBeforeExamples:
 RSpec/ExampleLength:
   Exclude:
     - 'spec/**/*'
+
+RSpec/DescribeClass:
+  Exclude:
+    - 'spec/integration/**/*'
 
 Lint/EmptyClass:
   Exclude:
