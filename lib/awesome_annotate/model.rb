@@ -5,12 +5,14 @@ require 'thor'
 require_relative 'annotation_block'
 require_relative 'error'
 require_relative 'rails_environment'
+require_relative 'schema_annotation'
 
 module AwesomeAnnotate
   class Model < Thor
     include AnnotationBlock
     include Thor::Actions
     include RailsEnvironment
+    include SchemaAnnotation
 
     def initialize(params = {})
       super()
@@ -48,49 +50,6 @@ module AwesomeAnnotate
         content: message,
         before: /^class\s+\w+\s+<\s+\w+/
       )
-    end
-
-    def schema_annotation(klass)
-      columns = klass.columns
-      column_name_width = columns.map { |column| column.name.length }.max || 0
-      column_type_width = columns.map { |column| column_type(column).length }.max || 0
-
-      [
-        schema_header(klass),
-        columns.map { |column| column_annotation(klass, column, column_name_width, column_type_width) }.join,
-        "#\n"
-      ].join
-    end
-
-    def schema_header(klass)
-      [
-        "# == Schema Information\n",
-        "#\n",
-        "# Table name: #{klass.table_name}\n",
-        "#\n"
-      ].join
-    end
-
-    def column_annotation(klass, column, column_name_width, column_type_width)
-      column_name = column.name.ljust(column_name_width)
-      type = column_type(column).ljust(column_type_width)
-      details = column_details(klass, column)
-      line = "#  #{column_name} :#{type}"
-
-      line = "#{line} #{details.join(', ')}" if details.any?
-      "#{line}\n"
-    end
-
-    def column_type(column)
-      column.type.to_s
-    end
-
-    def column_details(klass, column)
-      details = []
-      details << 'not null' if column.null == false
-      details << 'primary key' if column.name == klass.primary_key
-      details << "default(#{column.default.inspect})" unless column.default.nil?
-      details
     end
 
     def model_file_path(model_name)

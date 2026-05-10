@@ -24,6 +24,9 @@ RSpec.describe AwesomeAnnotate::Model do
           expect(file_content).to include '# Table name: users'
           expect(file_content).to include '#  id         :integer  not null, primary key'
           expect(file_content).to include '#  email      :string   not null, default("")'
+          expect(file_content).to include '# Indexes'
+          expect(file_content).to include '#  (email)       UNIQUE, index_users_on_email'
+          expect(file_content).to include '#  (name,email)  index_users_on_name_and_email'
         end
 
         it 'replaces existing annotate block' do
