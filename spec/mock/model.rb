@@ -2,7 +2,7 @@
 
 module ActiveRecord
   class Base
-    def self.column_names
+    def self.columns
       []
     end
   end
