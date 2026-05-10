@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.2.0] - 2026-05-10
+
+- Added model schema annotations with column type, nullability, primary key,
+  default value, and basic index information.
+- Added duplicate-safe annotation blocks with AwesomeAnnotate start and end
+  markers.
+- Added route annotations for `config/routes.rb`.
+- Added model commands:
+  - `awesome_annotate model MODEL`
+  - `awesome_annotate models`
+  - `awesome_annotate models MODEL...`
+- Added `awesome_annotate all` to annotate all models and routes.
+- Added remove commands:
+  - `awesome_annotate remove model MODEL`
+  - `awesome_annotate remove models`
+  - `awesome_annotate remove routes`
+  - `awesome_annotate remove all`
+- Added Rails-like integration specs and GitHub Actions CI for RSpec and
+  RuboCop.
+- Documented supported Ruby and Active Record versions.
+
 ## [0.1.3] - 2024-05-05
 
 - Add a new feature

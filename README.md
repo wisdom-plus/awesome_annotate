@@ -1,13 +1,14 @@
 # AwesomeAnnotate
 
-AwesomeAnnotate adds generated comments to Rails model and routes files.
+AwesomeAnnotate adds generated schema and route comments to Rails applications.
 
 This gem is intended as a small replacement-style tool for the basic features of
 the original `annotate` gem:
 
-- annotate a model file with its Active Record column names
+- annotate model files with Active Record schema information
 - annotate `config/routes.rb` with the application's route table
 - replace previous AwesomeAnnotate blocks instead of appending duplicates
+- remove generated AwesomeAnnotate blocks
 
 ## Requirements
 
@@ -41,6 +42,20 @@ gem 'awesome_annotate', git: 'https://github.com/wisdom-plus/awesome_annotate'
 ## Usage
 
 Run commands from the root directory of a Rails application.
+
+Available commands:
+
+```sh
+bundle exec awesome_annotate model user
+bundle exec awesome_annotate models
+bundle exec awesome_annotate models user article admin/user
+bundle exec awesome_annotate routes
+bundle exec awesome_annotate all
+bundle exec awesome_annotate remove model user
+bundle exec awesome_annotate remove models
+bundle exec awesome_annotate remove routes
+bundle exec awesome_annotate remove all
+```
 
 Annotate a model:
 
