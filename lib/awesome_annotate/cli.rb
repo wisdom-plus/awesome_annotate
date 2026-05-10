@@ -7,6 +7,29 @@ require 'awesome_annotate/version'
 require 'thor'
 
 module AwesomeAnnotate
+  class Remove < Thor
+    desc 'model [model_name]', 'remove annotation from a model'
+    def model(model_name)
+      AwesomeAnnotate::Model.new.remove(model_name)
+    end
+
+    desc 'models [model_names...]', 'remove annotations from all models or specified models'
+    def models(*model_names)
+      AwesomeAnnotate::Model.new.remove_all(model_names)
+    end
+
+    desc 'routes', 'remove annotation from `config/routes.rb`'
+    def routes
+      AwesomeAnnotate::Route.new.remove
+    end
+
+    desc 'all', 'remove annotations from all models and routes'
+    def all
+      AwesomeAnnotate::Model.new.remove_all
+      AwesomeAnnotate::Route.new.remove
+    end
+  end
+
   class CLI < Thor
     include Thor::Actions
 
@@ -38,6 +61,9 @@ module AwesomeAnnotate
       AwesomeAnnotate::Model.new.annotate_all
       AwesomeAnnotate::Route.new.annotate
     end
+
+    desc 'remove SUBCOMMAND', 'remove generated annotations'
+    subcommand 'remove', Remove
 
     def self.exit_on_failure?
       true

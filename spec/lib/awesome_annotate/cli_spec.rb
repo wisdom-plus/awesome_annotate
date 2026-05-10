@@ -37,4 +37,20 @@ RSpec.describe AwesomeAnnotate::CLI do
       expect(route_annotator).to have_received(:annotate)
     end
   end
+
+  describe 'AwesomeAnnotate::Remove#all' do
+    it 'removes all model and route annotations' do
+      model_annotator = instance_double(AwesomeAnnotate::Model)
+      route_annotator = instance_double(AwesomeAnnotate::Route)
+      allow(AwesomeAnnotate::Model).to receive(:new).and_return(model_annotator)
+      allow(AwesomeAnnotate::Route).to receive(:new).and_return(route_annotator)
+      allow(model_annotator).to receive(:remove_all)
+      allow(route_annotator).to receive(:remove)
+
+      AwesomeAnnotate::Remove.new.all
+
+      expect(model_annotator).to have_received(:remove_all)
+      expect(route_annotator).to have_received(:remove)
+    end
+  end
 end

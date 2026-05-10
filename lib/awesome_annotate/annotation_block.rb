@@ -12,6 +12,17 @@ module AwesomeAnnotate
       File.write(path, replace_annotation(file_content, marker, annotation, before))
     end
 
+    def remove_annotation(file_path:, marker:)
+      path = file_path.to_s
+      file_content = File.read(path)
+      pattern = annotation_block_pattern(marker)
+
+      return false unless file_content.match?(pattern)
+
+      File.write(path, file_content.gsub(pattern, ''))
+      true
+    end
+
     def annotation_block(marker, content)
       body = content.end_with?("\n") ? content : "#{content}\n"
 

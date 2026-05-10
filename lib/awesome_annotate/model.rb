@@ -41,10 +41,26 @@ module AwesomeAnnotate
       end
     end
 
+    desc 'remove [model name]', 'remove annotation from your model'
+    def remove(model_name)
+      file_path = model_file_path(model_name)
+
+      remove_model_annotation(file_path)
+    end
+
+    desc 'remove_all [model names]', 'remove annotations from all models or specified models'
+    def remove_all(model_names = [])
+      if model_names.empty?
+        discovered_model_file_paths.each { |file_path| remove_model_annotation(file_path, report_missing: false) }
+      else
+        model_names.each { |model_name| remove(model_name) }
+      end
+    end
+
     private
 
-    def annotate_loaded_model(model_name)
-      klass = klass_name(model_name)
+    def annotate_loaded_model(model_name, report_missing: true)
+      klass = klass_name(model_name, report_missing: report_missing)
 
       return say 'This model does not inherit activerecord' unless klass < ActiveRecord::Base
 
@@ -55,16 +71,16 @@ module AwesomeAnnotate
       say "annotate #{model_name.pluralize} table columns in #{file_path}"
     end
 
-    def model_dir
-      Pathname.new('app/models')
+    def discover_model_names
+      discovered_model_file_paths.map { |file_path| model_name_from_file_path(file_path) }
     end
 
-    def discover_model_names
-      Dir.glob(@model_dir.join('**/*.rb')).filter_map do |file_path|
-        next if excluded_model_file?(file_path)
+    def discovered_model_file_paths
+      Dir.glob(@model_dir.join('**/*.rb')).reject { |file_path| excluded_model_file?(file_path) }
+    end
 
-        Pathname.new(file_path).relative_path_from(@model_dir).sub_ext('').to_s
-      end
+    def model_name_from_file_path(file_path)
+      Pathname.new(file_path).relative_path_from(@model_dir).sub_ext('').to_s
     end
 
     def excluded_model_file?(file_path)
@@ -74,9 +90,17 @@ module AwesomeAnnotate
     end
 
     def annotate_discovered_model(model_name)
-      annotate_loaded_model(model_name)
+      annotate_loaded_model(model_name, report_missing: false)
     rescue AwesomeAnnotate::NotFoundError
       nil
+    end
+
+    def remove_model_annotation(file_path, report_missing: true)
+      if remove_annotation(file_path: file_path, marker: 'columns')
+        say "remove model annotation in #{file_path}"
+      elsif report_missing
+        say "no model annotation in #{file_path}"
+      end
     end
 
     def insert_file_before_class(file_path, message)
@@ -99,11 +123,11 @@ module AwesomeAnnotate
       file_path
     end
 
-    def klass_name(model_name)
+    def klass_name(model_name, report_missing: true)
       name = model_name.singularize.camelize
       Object.const_get(name)
     rescue NameError
-      say 'Model not found'
+      say 'Model not found' if report_missing
       raise AwesomeAnnotate::NotFoundError
     end
 
