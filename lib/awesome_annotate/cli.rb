@@ -33,6 +33,12 @@ module AwesomeAnnotate
       AwesomeAnnotate::Route.new.annotate
     end
 
+    desc 'all', 'annotate all models and routes'
+    def all
+      AwesomeAnnotate::Model.new.annotate_all
+      AwesomeAnnotate::Route.new.annotate
+    end
+
     def self.exit_on_failure?
       true
     end
