@@ -1,9 +1,15 @@
+# frozen_string_literal: true
+
 require 'active_record'
 require 'thor'
+require_relative 'annotation_block'
+require_relative 'rails_environment'
 
 module AwesomeAnnotate
   class Route < Thor
+    include AnnotationBlock
     include Thor::Actions
+    include RailsEnvironment
 
     def initialize(params = {})
       super()
@@ -13,9 +19,9 @@ module AwesomeAnnotate
 
     desc 'annotate all routes', 'annotate your routes'
     def annotate
-      raise "Rails application path is required" unless @env_file_path.exist?
+      raise 'Rails application path is required' unless @env_file_path.exist?
 
-      apply @env_file_path.to_s
+      load_rails_environment
 
       inspector = ActionDispatch::Routing::RoutesInspector.new(Rails.application.routes.routes)
       formatter = ActionDispatch::Routing::ConsoleFormatter::Sheet.new
@@ -23,7 +29,7 @@ module AwesomeAnnotate
       routes = inspector.format(formatter, {})
       route_message = parse_routes(routes)
 
-      raise "Route file not found" unless @route_file_path.exist?
+      raise 'Route file not found' unless @route_file_path.exist?
 
       insert_file_before_class(@route_file_path, route_message)
 
@@ -43,13 +49,17 @@ module AwesomeAnnotate
     end
 
     def insert_file_before_class(file_path, message)
-      insert_into_file file_path, :before => "Rails.application.routes.draw do\n" do
-        message
-      end
+      replace_or_insert_annotation(
+        file_path: file_path,
+        marker: 'routes',
+        content: message,
+        before: "Rails.application.routes.draw do\n"
+      )
     end
 
     def self.source_root
       Dir.pwd
     end
+    private_class_method :source_root
   end
 end

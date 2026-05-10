@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module RouteMock
   def route_mock(routes_message)
     inspector = double(ActionDispatch::Routing::RoutesInspector)
