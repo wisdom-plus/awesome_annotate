@@ -48,6 +48,18 @@ Annotate a model:
 bundle exec awesome_annotate model user
 ```
 
+Annotate all models:
+
+```sh
+bundle exec awesome_annotate models
+```
+
+Annotate specific models:
+
+```sh
+bundle exec awesome_annotate models user article admin/user
+```
+
 This loads `config/environment.rb`, resolves `User`, reads its Active Record
 columns, and writes a schema block before the class definition in
 `app/models/user.rb`:

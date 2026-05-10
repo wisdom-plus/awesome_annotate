@@ -2,6 +2,8 @@
 
 require 'active_record'
 require_relative '../app/models/user'
+require_relative '../app/models/article'
+require_relative '../app/models/application_record'
 
 class ActionDispatch
   class Routing

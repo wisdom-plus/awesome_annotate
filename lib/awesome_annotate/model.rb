@@ -25,7 +25,25 @@ module AwesomeAnnotate
       raise 'Rails application path is required' unless @env_file_path.exist?
 
       load_rails_environment
+      annotate_loaded_model(model_name)
+    end
 
+    desc 'models [model names]', 'annotate all models or specified models'
+    def annotate_all(model_names = [])
+      raise 'Rails application path is required' unless @env_file_path.exist?
+
+      load_rails_environment
+
+      if model_names.empty?
+        discover_model_names.each { |model_name| annotate_discovered_model(model_name) }
+      else
+        model_names.each { |model_name| annotate_loaded_model(model_name) }
+      end
+    end
+
+    private
+
+    def annotate_loaded_model(model_name)
       klass = klass_name(model_name)
 
       return say 'This model does not inherit activerecord' unless klass < ActiveRecord::Base
@@ -37,10 +55,28 @@ module AwesomeAnnotate
       say "annotate #{model_name.pluralize} table columns in #{file_path}"
     end
 
-    private
-
     def model_dir
       Pathname.new('app/models')
+    end
+
+    def discover_model_names
+      Dir.glob(@model_dir.join('**/*.rb')).filter_map do |file_path|
+        next if excluded_model_file?(file_path)
+
+        Pathname.new(file_path).relative_path_from(@model_dir).sub_ext('').to_s
+      end
+    end
+
+    def excluded_model_file?(file_path)
+      relative_path = Pathname.new(file_path).relative_path_from(@model_dir).to_s
+
+      relative_path == 'application_record.rb' || relative_path.start_with?('concerns/')
+    end
+
+    def annotate_discovered_model(model_name)
+      annotate_loaded_model(model_name)
+    rescue AwesomeAnnotate::NotFoundError
+      nil
     end
 
     def insert_file_before_class(file_path, message)

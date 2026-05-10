@@ -22,6 +22,11 @@ module AwesomeAnnotate
       AwesomeAnnotate::Model.new.annotate(model_name)
     end
 
+    desc 'models [model_names...]', 'annotate all models or specified models'
+    def models(*model_names)
+      AwesomeAnnotate::Model.new.annotate_all(model_names)
+    end
+
     map %w[routes -r] => :routes
     desc 'routes', 'Writes application route information to `config/routes.rb`.'
     def routes

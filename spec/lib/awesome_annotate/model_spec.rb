@@ -62,4 +62,45 @@ RSpec.describe AwesomeAnnotate::Model do
       end
     end
   end
+
+  describe '#annotate_all' do
+    context 'when model names are specified' do
+      it 'annotates specified models only' do
+        expect do
+          annotate_model.annotate_all(%w[user])
+        end.to output(%r{annotate users table columns in spec/mock/user\.rb}).to_stdout
+
+        user_content = File.read("#{model_dir}/user.rb")
+        article_content = File.read("#{model_dir}/article.rb")
+
+        expect(user_content).to include '# Table name: users'
+        expect(article_content).not_to include '# == AwesomeAnnotate: columns'
+      end
+
+      after { file_reset("#{model_dir}/user.rb") }
+    end
+
+    context 'when model names are not specified' do
+      it 'discovers and annotates all model files' do
+        expect do
+          annotate_model.annotate_all
+        end.to output(/annotate articles table columns.*annotate users table columns/m).to_stdout
+
+        user_content = File.read("#{model_dir}/user.rb")
+        article_content = File.read("#{model_dir}/article.rb")
+        application_record_content = File.read("#{model_dir}/application_record.rb")
+        concern_content = File.read("#{model_dir}/concerns/auditable.rb")
+
+        expect(user_content).to include '# Table name: users'
+        expect(article_content).to include '# Table name: articles'
+        expect(application_record_content).not_to include '# == AwesomeAnnotate: columns'
+        expect(concern_content).not_to include '# == AwesomeAnnotate: columns'
+      end
+
+      after do
+        file_reset("#{model_dir}/user.rb")
+        file_reset("#{model_dir}/article.rb")
+      end
+    end
+  end
 end
