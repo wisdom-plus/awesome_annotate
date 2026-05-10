@@ -1,10 +1,12 @@
 require 'active_record'
 require 'thor'
 require_relative 'error'
+require_relative 'rails_environment'
 
 module AwesomeAnnotate
   class Model < Thor
     include Thor::Actions
+    include RailsEnvironment
 
     def initialize(params = {})
       super()
@@ -31,10 +33,6 @@ module AwesomeAnnotate
     end
 
     private
-
-    def load_rails_environment
-      require @env_file_path.expand_path.to_s
-    end
 
     def model_dir
       Pathname.new('app/models')
