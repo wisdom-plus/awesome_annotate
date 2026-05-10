@@ -28,12 +28,12 @@ module AwesomeAnnotate
 
       "# == AwesomeAnnotate: #{marker}\n" \
         "#{body}" \
-        "# == /AwesomeAnnotate: #{marker}\n"
+        "# == /AwesomeAnnotate: #{marker}\n\n"
     end
 
     def annotation_block_pattern(marker)
       escaped_marker = Regexp.escape(marker)
-      %r{^# == AwesomeAnnotate: #{escaped_marker}\n.*?^# == /AwesomeAnnotate: #{escaped_marker}\n}m
+      %r{^# == AwesomeAnnotate: #{escaped_marker}\n.*?^# == /AwesomeAnnotate: #{escaped_marker}\n(?:\n)*}m
     end
 
     def replace_annotation(file_content, marker, annotation, before)

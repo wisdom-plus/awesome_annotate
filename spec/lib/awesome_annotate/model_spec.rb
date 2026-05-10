@@ -27,6 +27,7 @@ RSpec.describe AwesomeAnnotate::Model do
           expect(file_content).to include '# Indexes'
           expect(file_content).to include '#  (email)       UNIQUE, index_users_on_email'
           expect(file_content).to include '#  (name,email)  index_users_on_name_and_email'
+          expect(file_content).to include "# == /AwesomeAnnotate: columns\n\nclass User < ActiveRecord::Base"
         end
 
         it 'replaces existing annotate block' do
