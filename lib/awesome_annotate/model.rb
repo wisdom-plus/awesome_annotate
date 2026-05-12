@@ -1,10 +1,12 @@
 require 'active_record'
 require 'thor'
+require_relative 'annotation_block'
 require_relative 'error'
 require_relative 'rails_environment'
 
 module AwesomeAnnotate
   class Model < Thor
+    include AnnotationBlock
     include Thor::Actions
     include RailsEnvironment
 
@@ -27,7 +29,7 @@ module AwesomeAnnotate
       column_names = column_names(klass)
       file_path = model_file_path(model_name)
 
-      insert_file_before_class(file_path, klass, "# Columns: #{column_names.join(', ')}\n")
+      insert_file_before_class(file_path, "# Columns: #{column_names.join(', ')}\n")
 
       say "annotate #{model_name.pluralize} table columns in #{file_path}"
     end
@@ -38,10 +40,13 @@ module AwesomeAnnotate
       Pathname.new('app/models')
     end
 
-    def insert_file_before_class(file_path, klass, message)
-      insert_into_file file_path, :before => /^class\s+\w+\s+<\s+\w+/ do
-        message
-      end
+    def insert_file_before_class(file_path, message)
+      replace_or_insert_annotation(
+        file_path:,
+        marker: 'columns',
+        content: message,
+        before: /^class\s+\w+\s+<\s+\w+/
+      )
     end
 
     def column_names(klass)

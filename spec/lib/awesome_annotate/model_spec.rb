@@ -15,7 +15,18 @@ RSpec.describe AwesomeAnnotate::Model do
         it 'write columns in model files' do
           expect { annotate_model.annotate('user') }.to output(/annotate users table columns in spec\/mock\/user\.rb/).to_stdout
           file_content = File.read("#{model_dir}/user.rb")
+          expect(file_content).to include "# == AwesomeAnnotate: columns"
+          expect(file_content).to include "# == /AwesomeAnnotate: columns"
           expect(file_content).to include "Columns: id, name, email, created_at, updated_at"
+        end
+
+        it 'replaces existing annotate block' do
+          expect { 2.times { annotate_model.annotate('user') } }.to output(/annotate users table columns/).to_stdout
+
+          file_content = File.read("#{model_dir}/user.rb")
+          expect(file_content.scan("# == AwesomeAnnotate: columns").size).to eq 1
+          expect(file_content.scan("# == /AwesomeAnnotate: columns").size).to eq 1
+          expect(file_content.scan("Columns: id, name, email, created_at, updated_at").size).to eq 1
         end
 
         after { file_reset("#{model_dir}/user.rb", false) }

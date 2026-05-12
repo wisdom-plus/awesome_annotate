@@ -30,7 +30,18 @@ RSpec.describe AwesomeAnnotate::Route do
         it 'write route annotate in routes file' do
           expect { annotate_model.annotate }.to output(/annotate routes in spec\/mock\/routes\.rb/).to_stdout
           file_content = File.read(route_file_path)
+          expect(file_content).to include "# == AwesomeAnnotate: routes"
+          expect(file_content).to include "# == /AwesomeAnnotate: routes"
           expect(file_content).to include parse_routes(routes_message)
+        end
+
+        it 'replaces existing annotate block' do
+          expect { 2.times { annotate_model.annotate } }.to output(/annotate routes/).to_stdout
+
+          file_content = File.read(route_file_path)
+          expect(file_content.scan("# == AwesomeAnnotate: routes").size).to eq 1
+          expect(file_content.scan("# == /AwesomeAnnotate: routes").size).to eq 1
+          expect(file_content.scan("#---This is route annotate---").size).to eq 1
         end
 
         after { file_reset(route_file_path, true) }

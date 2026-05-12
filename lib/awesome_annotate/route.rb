@@ -1,9 +1,11 @@
 require 'active_record'
 require 'thor'
+require_relative 'annotation_block'
 require_relative 'rails_environment'
 
 module AwesomeAnnotate
   class Route < Thor
+    include AnnotationBlock
     include Thor::Actions
     include RailsEnvironment
 
@@ -45,9 +47,12 @@ module AwesomeAnnotate
     end
 
     def insert_file_before_class(file_path, message)
-      insert_into_file file_path, :before => "Rails.application.routes.draw do\n" do
-        message
-      end
+      replace_or_insert_annotation(
+        file_path:,
+        marker: 'routes',
+        content: message,
+        before: "Rails.application.routes.draw do\n"
+      )
     end
 
     def self.source_root
