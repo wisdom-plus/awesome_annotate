@@ -34,7 +34,7 @@ RSpec.describe AwesomeAnnotate::Model do
 
       context 'when model is not found' do
         it do
-          expect { annotate_model.annotate('admin') }.to raise_error(NotFoundError)
+          expect { annotate_model.annotate('admin') }.to raise_error(AwesomeAnnotate::NotFoundError)
         end
       end
 

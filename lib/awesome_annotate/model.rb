@@ -58,7 +58,7 @@ module AwesomeAnnotate
 
       unless File.exist?(file_path)
         say "Model file not found"
-        raise NotFoundError
+        raise AwesomeAnnotate::NotFoundError
       end
 
       return file_path
@@ -70,7 +70,7 @@ module AwesomeAnnotate
 
     rescue NameError
       say "Model not found"
-      raise NotFoundError
+      raise AwesomeAnnotate::NotFoundError
     end
 
     def self.source_root

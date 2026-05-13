@@ -1,2 +1,6 @@
+# frozen_string_literal: true
 
-class NotFoundError < StandardError; end
+module AwesomeAnnotate
+  class Error < StandardError; end
+  class NotFoundError < Error; end
+end
