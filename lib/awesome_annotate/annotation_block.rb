@@ -30,7 +30,7 @@ module AwesomeAnnotate
 
     def annotation_block_pattern(marker)
       escaped_marker = Regexp.escape(marker)
-      /^# == AwesomeAnnotate: #{escaped_marker}\n.*?^# == \/AwesomeAnnotate: #{escaped_marker}\n/m
+      %r{^# == AwesomeAnnotate: #{escaped_marker}\n.*?^# == /AwesomeAnnotate: #{escaped_marker}\n}m
     end
   end
 end

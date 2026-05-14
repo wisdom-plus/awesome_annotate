@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'awesome_annotate'
 require 'awesome_annotate/model'
 require 'awesome_annotate/route'
@@ -9,7 +11,7 @@ module AwesomeAnnotate
     include Thor::Actions
 
     map %w[--version -v] => :print_version
-    desc "--version, -v", "print the version"
+    desc '--version, -v', 'print the version'
     def print_version
       say AwesomeAnnotate::VERSION
     end
@@ -21,12 +23,10 @@ module AwesomeAnnotate
     end
 
     map %w[routes -r] => :routes
-    desc 'routes', "Writes application route information to `config/routes.rb`."
+    desc 'routes', 'Writes application route information to `config/routes.rb`.'
     def routes
       AwesomeAnnotate::Route.new.annotate
     end
-
-    private
 
     def self.exit_on_failure?
       true

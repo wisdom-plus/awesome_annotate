@@ -1,8 +1,7 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
-unless File.exist?('./Rakefile') || File.exist?('./Gemfile')
-  abort 'Please run annotate from the root of the project.'
-end
+abort 'Please run annotate from the root of the project.' unless File.exist?('./Rakefile') || File.exist?('./Gemfile')
 require 'awesome_annotate'
 
 AwesomeAnnotate::CLI.start ARGV
