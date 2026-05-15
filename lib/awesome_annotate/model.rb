@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'active_record'
 require 'thor'
 require_relative 'annotation_block'
@@ -18,7 +20,7 @@ module AwesomeAnnotate
 
     desc 'model [model name]', 'annotate your model'
     def annotate(model_name)
-      raise "Rails application path is required" unless @env_file_path.exist?
+      raise 'Rails application path is required' unless @env_file_path.exist?
 
       load_rails_environment
 
@@ -42,7 +44,7 @@ module AwesomeAnnotate
 
     def insert_file_before_class(file_path, message)
       replace_or_insert_annotation(
-        file_path:,
+        file_path: file_path,
         marker: 'columns',
         content: message,
         before: /^class\s+\w+\s+<\s+\w+/
@@ -57,24 +59,24 @@ module AwesomeAnnotate
       file_path = "#{@model_dir}/#{model_name}.rb"
 
       unless File.exist?(file_path)
-        say "Model file not found"
+        say 'Model file not found'
         raise AwesomeAnnotate::NotFoundError
       end
 
-      return file_path
+      file_path
     end
 
     def klass_name(model_name)
       name = model_name.singularize.camelize
-      return Object.const_get(name)
-
+      Object.const_get(name)
     rescue NameError
-      say "Model not found"
+      say 'Model not found'
       raise AwesomeAnnotate::NotFoundError
     end
 
     def self.source_root
       Dir.pwd
     end
+    private_class_method :source_root
   end
 end

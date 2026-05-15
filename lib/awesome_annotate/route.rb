@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'active_record'
 require 'thor'
 require_relative 'annotation_block'
@@ -17,7 +19,7 @@ module AwesomeAnnotate
 
     desc 'annotate all routes', 'annotate your routes'
     def annotate
-      raise "Rails application path is required" unless @env_file_path.exist?
+      raise 'Rails application path is required' unless @env_file_path.exist?
 
       load_rails_environment
 
@@ -27,7 +29,7 @@ module AwesomeAnnotate
       routes = inspector.format(formatter, {})
       route_message = parse_routes(routes)
 
-      raise "Route file not found" unless @route_file_path.exist?
+      raise 'Route file not found' unless @route_file_path.exist?
 
       insert_file_before_class(@route_file_path, route_message)
 
@@ -48,7 +50,7 @@ module AwesomeAnnotate
 
     def insert_file_before_class(file_path, message)
       replace_or_insert_annotation(
-        file_path:,
+        file_path: file_path,
         marker: 'routes',
         content: message,
         before: "Rails.application.routes.draw do\n"
@@ -58,5 +60,6 @@ module AwesomeAnnotate
     def self.source_root
       Dir.pwd
     end
+    private_class_method :source_root
   end
 end

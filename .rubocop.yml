@@ -3,6 +3,7 @@ require:
   - rubocop-rspec
 
 AllCops:
+  TargetRubyVersion: 3.0
   Exclude:
     - 'vendor/**/*'
     - 'spec/fixtures/**/*'
@@ -10,6 +11,37 @@ AllCops:
     - 'spec/integration/**/*'
   NewCops: enable
 
+Style/Documentation:
+  Enabled: false
+
 Metrics/BlockLength:
   Exclude:
     - 'spec/**/*.rb'
+
+Metrics/AbcSize:
+  Exclude:
+    - 'spec/support/**/*'
+
+RSpec/VerifiedDoubles:
+  Exclude:
+    - 'spec/support/**/*'
+
+RSpec/MultipleExpectations:
+  Exclude:
+    - 'spec/**/*'
+
+RSpec/NestedGroups:
+  Exclude:
+    - 'spec/**/*'
+
+RSpec/HooksBeforeExamples:
+  Exclude:
+    - 'spec/**/*'
+
+RSpec/ExampleLength:
+  Exclude:
+    - 'spec/**/*'
+
+Lint/EmptyClass:
+  Exclude:
+    - 'spec/support/rails.rb'
