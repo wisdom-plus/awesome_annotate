@@ -11,6 +11,7 @@ gem 'thor', '~> 1.3', require: false
 
 group :test do
   gem 'benchmark'
+  gem 'logger'
   gem 'rspec', '~> 3.0', require: false
   gem 'rubocop', '~> 1.21', require: false
   gem 'rubocop-rake', require: false
