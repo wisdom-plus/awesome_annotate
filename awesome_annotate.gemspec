@@ -12,7 +12,11 @@ Gem::Specification.new do |spec|
   spec.description = 'annotate your code with comments (e.g. model schema, routes, etc.)'
   spec.homepage = 'https://github.com/wisdom-plus/awesome_annotate'
   spec.license = 'MIT'
-  spec.required_ruby_version = '>= 3.0.0'
+  # ruby-version
+  spec.required_ruby_version = ['>= 3.0', '< 4.0']
+  # dependency
+  spec.add_dependency 'activerecord', '>= 6.1', '< 8.0'
+  spec.add_dependency 'thor', '~> 1.3'
 
   spec.metadata['allowed_push_host'] = 'https://rubygems.org'
 
@@ -31,7 +35,5 @@ Gem::Specification.new do |spec|
   spec.bindir = 'exe'
   spec.executables = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
-  spec.add_dependency 'activerecord', '>= 6.1.0'
-  spec.add_dependency 'thor'
   spec.metadata['rubygems_mfa_required'] = 'true'
 end
