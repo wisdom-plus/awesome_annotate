@@ -20,7 +20,10 @@ RSpec.describe AwesomeAnnotate::Model do
           file_content = File.read("#{model_dir}/user.rb")
           expect(file_content).to include '# == AwesomeAnnotate: columns'
           expect(file_content).to include '# == /AwesomeAnnotate: columns'
-          expect(file_content).to include 'Columns: id, name, email, created_at, updated_at'
+          expect(file_content).to include '# == Schema Information'
+          expect(file_content).to include '# Table name: users'
+          expect(file_content).to include '#  id         :integer  not null, primary key'
+          expect(file_content).to include '#  email      :string   not null, default("")'
         end
 
         it 'replaces existing annotate block' do
@@ -29,7 +32,7 @@ RSpec.describe AwesomeAnnotate::Model do
           file_content = File.read("#{model_dir}/user.rb")
           expect(file_content.scan('# == AwesomeAnnotate: columns').size).to eq 1
           expect(file_content.scan('# == /AwesomeAnnotate: columns').size).to eq 1
-          expect(file_content.scan('Columns: id, name, email, created_at, updated_at').size).to eq 1
+          expect(file_content.scan('# == Schema Information').size).to eq 1
         end
 
         after { file_reset("#{model_dir}/user.rb") }

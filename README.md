@@ -49,11 +49,21 @@ bundle exec awesome_annotate model user
 ```
 
 This loads `config/environment.rb`, resolves `User`, reads its Active Record
-columns, and writes a block before the class definition in `app/models/user.rb`:
+columns, and writes a schema block before the class definition in
+`app/models/user.rb`:
 
 ```ruby
 # == AwesomeAnnotate: columns
-# Columns: id, name, email, created_at, updated_at
+# == Schema Information
+#
+# Table name: users
+#
+#  id         :integer  not null, primary key
+#  name       :string
+#  email      :string   not null, default("")
+#  created_at :datetime not null
+#  updated_at :datetime not null
+#
 # == /AwesomeAnnotate: columns
 class User < ApplicationRecord
 end
@@ -107,7 +117,9 @@ runs.
 
 ## Current Limitations
 
-- Only model column names and routes are supported.
+- Only model schema blocks and routes are supported.
+- Model annotations include column type, nullability, primary key, and default
+  values. Index information is not supported yet.
 - Model annotation currently targets files under `app/models`.
 - Model class detection expects a simple class declaration such as
   `class User < ApplicationRecord`.
