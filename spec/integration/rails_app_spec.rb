@@ -30,6 +30,7 @@ RSpec.describe 'Rails application annotation' do
     expect(model_content.scan('# == /AwesomeAnnotate: columns').size).to eq 1
     expect(model_content).to include '# == Schema Information'
     expect(model_content).to include '#  id         :integer  not null, primary key'
+    expect(model_content).to include '#  (email)       UNIQUE, index_users_on_email'
     expect(model_content).to include 'class User < ActiveRecord::Base'
   end
 

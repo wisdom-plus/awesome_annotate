@@ -2,6 +2,7 @@
 
 class User < ActiveRecord::Base
   Column = Struct.new(:name, :type, :null, :default, keyword_init: true) unless const_defined?(:Column, false)
+  Index = Struct.new(:columns, :unique, :name, keyword_init: true) unless const_defined?(:Index, false)
 
   def self.columns
     [
@@ -19,5 +20,18 @@ class User < ActiveRecord::Base
 
   def self.table_name
     'users'
+  end
+
+  def self.connection
+    Connection.new
+  end
+
+  class Connection
+    def indexes(_table_name)
+      [
+        Index.new(columns: ['email'], unique: true, name: 'index_users_on_email'),
+        Index.new(columns: %w[name email], unique: false, name: 'index_users_on_name_and_email')
+      ]
+    end
   end
 end

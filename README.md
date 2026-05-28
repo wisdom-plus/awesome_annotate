@@ -64,6 +64,11 @@ columns, and writes a schema block before the class definition in
 #  created_at :datetime not null
 #  updated_at :datetime not null
 #
+# Indexes
+#
+#  (email)       UNIQUE, index_users_on_email
+#  (name,email)  index_users_on_name_and_email
+#
 # == /AwesomeAnnotate: columns
 class User < ApplicationRecord
 end
@@ -119,7 +124,7 @@ runs.
 
 - Only model schema blocks and routes are supported.
 - Model annotations include column type, nullability, primary key, and default
-  values. Index information is not supported yet.
+  values, plus basic index information.
 - Model annotation currently targets files under `app/models`.
 - Model class detection expects a simple class declaration such as
   `class User < ApplicationRecord`.
