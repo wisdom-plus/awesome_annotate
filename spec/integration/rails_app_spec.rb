@@ -45,4 +45,22 @@ RSpec.describe 'Rails application annotation' do
     expect(route_content).to include '# users GET /users(.:format) users#index'
     expect(route_content).to include 'Rails.application.routes.draw do'
   end
+
+  it 'annotates discovered model files in a Rails-like application root' do
+    annotator = AwesomeAnnotate::Model.new
+
+    expect do
+      annotator.annotate_all
+    end.to output(/annotate articles table columns.*annotate users table columns/m).to_stdout
+
+    user_content = File.read('app/models/user.rb')
+    article_content = File.read('app/models/article.rb')
+    application_record_content = File.read('app/models/application_record.rb')
+    concern_content = File.read('app/models/concerns/auditable.rb')
+
+    expect(user_content).to include '# Table name: users'
+    expect(article_content).to include '# Table name: articles'
+    expect(application_record_content).not_to include '# == AwesomeAnnotate: columns'
+    expect(concern_content).not_to include '# == AwesomeAnnotate: columns'
+  end
 end
