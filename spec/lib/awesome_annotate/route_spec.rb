@@ -8,7 +8,14 @@ require 'active_record'
 RSpec.describe AwesomeAnnotate::Route do
   let(:env_file_path) { 'spec/mock/config.rb' }
   let(:route_file_path) { 'spec/mock/routes.rb' }
-  let(:annotate_model) { described_class.new(env_file_path: env_file_path, route_file_path: route_file_path) }
+  let(:annotation_position) { 'top' }
+  let(:annotate_model) do
+    described_class.new(
+      env_file_path: env_file_path,
+      route_file_path: route_file_path,
+      annotation_position: annotation_position
+    )
+  end
   let(:routes_message) { File.readlines('spec/support/routes_message.txt').join }
 
   def parse_routes(routes)
@@ -44,6 +51,40 @@ RSpec.describe AwesomeAnnotate::Route do
           expect(file_content.scan('# == AwesomeAnnotate: routes').size).to eq 1
           expect(file_content.scan('# == /AwesomeAnnotate: routes').size).to eq 1
           expect(file_content.scan('#---This is route annotate---').size).to eq 1
+        end
+
+        context 'when annotation_position is bottom' do
+          let(:annotation_position) { 'bottom' }
+
+          it 'writes the annotation at the bottom of the route file' do
+            expect { annotate_model.annotate }.to output(%r{annotate routes in spec/mock/routes\.rb}).to_stdout
+
+            file_content = File.read(route_file_path)
+            route_position = file_content.index('Rails.application.routes.draw do')
+            annotation_position = file_content.index('# == AwesomeAnnotate: routes')
+            expect(route_position).to be < annotation_position
+            expect(file_content).to end_with("# == /AwesomeAnnotate: routes\n\n")
+          end
+        end
+
+        context 'when exclude_routes is set' do
+          let(:annotate_model) do
+            described_class.new(
+              env_file_path: env_file_path,
+              route_file_path: route_file_path,
+              annotation_position: annotation_position,
+              exclude_routes: ['*private_policy*']
+            )
+          end
+
+          it 'does not write excluded route lines' do
+            expect { annotate_model.annotate }.to output(%r{annotate routes in spec/mock/routes\.rb}).to_stdout
+
+            file_content = File.read(route_file_path)
+            expect(file_content).to include 'home#top'
+            expect(file_content).to include 'home#policy'
+            expect(file_content).not_to include 'home#private_policy'
+          end
         end
 
         after { file_reset(route_file_path) }

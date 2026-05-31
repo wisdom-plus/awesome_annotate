@@ -4,12 +4,12 @@ module AwesomeAnnotate
   module AnnotationBlock
     private
 
-    def replace_or_insert_annotation(file_path:, marker:, content:, before:)
+    def replace_or_insert_annotation(file_path:, marker:, content:, before:, position: 'top')
       path = file_path.to_s
       file_content = File.read(path)
       annotation = annotation_block(marker, content)
 
-      File.write(path, replace_annotation(file_content, marker, annotation, before))
+      File.write(path, replace_annotation(file_content, marker, annotation, before, position))
     end
 
     def remove_annotation(file_path:, marker:)
@@ -36,10 +36,12 @@ module AwesomeAnnotate
       %r{^# == AwesomeAnnotate: #{escaped_marker}\n.*?^# == /AwesomeAnnotate: #{escaped_marker}\n(?:\n)*}m
     end
 
-    def replace_annotation(file_content, marker, annotation, before)
+    def replace_annotation(file_content, marker, annotation, before, position)
       pattern = annotation_block_pattern(marker)
 
       return file_content.sub(pattern, annotation) if file_content.match?(pattern)
+
+      return "#{file_content.chomp}\n#{annotation}" if position.to_s == 'bottom'
 
       file_content.sub(before, "#{annotation}\\0")
     end

@@ -51,6 +51,7 @@ bundle exec awesome_annotate models
 bundle exec awesome_annotate models user article admin/user
 bundle exec awesome_annotate routes
 bundle exec awesome_annotate all
+bundle exec awesome_annotate init
 bundle exec awesome_annotate remove model user
 bundle exec awesome_annotate remove models
 bundle exec awesome_annotate remove routes
@@ -89,6 +90,40 @@ bundle exec awesome_annotate remove models
 bundle exec awesome_annotate remove routes
 bundle exec awesome_annotate remove all
 ```
+
+Create a configuration file:
+
+```sh
+bundle exec awesome_annotate init
+```
+
+This creates `config/initializers/awesome_annotate.yml`:
+
+```yaml
+# AwesomeAnnotate configuration
+#
+# Change these paths when your Rails app uses non-standard locations.
+env_file_path: config/environment.rb
+model_dir: app/models
+route_file_path: config/routes.rb
+annotation_position: top
+exclude_model_files: []
+include_indexes: true
+exclude_columns: []
+include_column_defaults: true
+exclude_routes: []
+```
+
+When this file exists, annotation and removal commands use these values. This
+allows applications with non-standard model, route, or environment file paths to
+change command behavior without passing Ruby options directly. Set
+`annotation_position` to `top` or `bottom` to choose where new annotation blocks
+are inserted. Set `exclude_model_files` to relative file paths or glob patterns
+under `model_dir` to skip them during model discovery. Set `include_indexes` to
+`false` to omit the Indexes section from model schema annotations. Set
+`exclude_columns` to column names to omit them from model schema annotations. Set
+`include_column_defaults` to `false` to omit `default(...)` details. Set
+`exclude_routes` to route line patterns to omit them from route annotations.
 
 This loads `config/environment.rb`, resolves `User`, reads its Active Record
 columns, and writes a schema block before the class definition in

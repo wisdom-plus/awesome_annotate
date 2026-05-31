@@ -8,7 +8,16 @@ require 'active_record'
 RSpec.describe AwesomeAnnotate::Model do
   let(:env_file_path) { 'spec/mock/config.rb' }
   let(:model_dir) { 'spec/mock' }
-  let(:annotate_model) { described_class.new(env_file_path: env_file_path, model_dir: model_dir) }
+  let(:annotation_position) { 'top' }
+  let(:exclude_model_files) { [] }
+  let(:annotate_model) do
+    described_class.new(
+      env_file_path: env_file_path,
+      model_dir: model_dir,
+      annotation_position: annotation_position,
+      exclude_model_files: exclude_model_files
+    )
+  end
 
   describe '#annotate' do
     context 'when env file path exists' do
@@ -37,6 +46,89 @@ RSpec.describe AwesomeAnnotate::Model do
           expect(file_content.scan('# == AwesomeAnnotate: columns').size).to eq 1
           expect(file_content.scan('# == /AwesomeAnnotate: columns').size).to eq 1
           expect(file_content.scan('# == Schema Information').size).to eq 1
+        end
+
+        context 'when annotation_position is bottom' do
+          let(:annotation_position) { 'bottom' }
+
+          it 'writes the annotation at the bottom of the model file' do
+            expect do
+              annotate_model.annotate('user')
+            end.to output(%r{annotate users table columns in spec/mock/user\.rb}).to_stdout
+
+            file_content = File.read("#{model_dir}/user.rb")
+            class_position = file_content.index('class User < ActiveRecord::Base')
+            annotation_position = file_content.index('# == AwesomeAnnotate: columns')
+            expect(class_position).to be < annotation_position
+            expect(file_content).to end_with("# == /AwesomeAnnotate: columns\n\n")
+          end
+        end
+
+        context 'when include_indexes is false' do
+          let(:annotate_model) do
+            described_class.new(
+              env_file_path: env_file_path,
+              model_dir: model_dir,
+              annotation_position: annotation_position,
+              exclude_model_files: exclude_model_files,
+              include_indexes: false
+            )
+          end
+
+          it 'does not write index annotations' do
+            expect do
+              annotate_model.annotate('user')
+            end.to output(%r{annotate users table columns in spec/mock/user\.rb}).to_stdout
+
+            file_content = File.read("#{model_dir}/user.rb")
+            expect(file_content).to include '#  email      :string   not null, default("")'
+            expect(file_content).not_to include '# Indexes'
+            expect(file_content).not_to include '#  (email)       UNIQUE, index_users_on_email'
+          end
+        end
+
+        context 'when exclude_columns is set' do
+          let(:annotate_model) do
+            described_class.new(
+              env_file_path: env_file_path,
+              model_dir: model_dir,
+              annotation_position: annotation_position,
+              exclude_model_files: exclude_model_files,
+              exclude_columns: ['email']
+            )
+          end
+
+          it 'does not write excluded columns' do
+            expect do
+              annotate_model.annotate('user')
+            end.to output(%r{annotate users table columns in spec/mock/user\.rb}).to_stdout
+
+            file_content = File.read("#{model_dir}/user.rb")
+            expect(file_content).to include '#  id         :integer  not null, primary key'
+            expect(file_content).not_to include '#  email'
+          end
+        end
+
+        context 'when include_column_defaults is false' do
+          let(:annotate_model) do
+            described_class.new(
+              env_file_path: env_file_path,
+              model_dir: model_dir,
+              annotation_position: annotation_position,
+              exclude_model_files: exclude_model_files,
+              include_column_defaults: false
+            )
+          end
+
+          it 'does not write column default details' do
+            expect do
+              annotate_model.annotate('user')
+            end.to output(%r{annotate users table columns in spec/mock/user\.rb}).to_stdout
+
+            file_content = File.read("#{model_dir}/user.rb")
+            expect(file_content).to include '#  email      :string   not null'
+            expect(file_content).not_to include 'default("")'
+          end
         end
 
         after { file_reset("#{model_dir}/user.rb") }
@@ -101,6 +193,24 @@ RSpec.describe AwesomeAnnotate::Model do
       after do
         file_reset("#{model_dir}/user.rb")
         file_reset("#{model_dir}/article.rb")
+      end
+
+      context 'when exclude_model_files is set' do
+        let(:exclude_model_files) { ['article.rb'] }
+
+        it 'skips excluded model files during discovery' do
+          expect do
+            annotate_model.annotate_all
+          end.to output(/annotate users table columns/).to_stdout
+
+          user_content = File.read("#{model_dir}/user.rb")
+          article_content = File.read("#{model_dir}/article.rb")
+
+          expect(user_content).to include '# Table name: users'
+          expect(article_content).not_to include '# == AwesomeAnnotate: columns'
+        end
+
+        after { file_reset("#{model_dir}/user.rb") }
       end
     end
   end

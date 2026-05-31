@@ -5,16 +5,26 @@ module AwesomeAnnotate
     private
 
     def schema_annotation(klass)
-      columns = klass.columns
-      column_name_width = columns.map { |column| column.name.length }.max || 0
-      column_type_width = columns.map { |column| column_type(column).length }.max || 0
+      columns = schema_columns(klass)
 
       [
         schema_header(klass),
-        columns.map { |column| column_annotation(klass, column, column_name_width, column_type_width) }.join,
-        index_annotations(klass),
+        column_annotations(klass, columns),
+        include_indexes? ? index_annotations(klass) : '',
         "#\n"
       ].join
+    end
+
+    def include_indexes?
+      @include_indexes != false
+    end
+
+    def include_column_defaults?
+      @include_column_defaults != false
+    end
+
+    def schema_columns(klass)
+      klass.columns.reject { |column| @exclude_columns.include?(column.name) }
     end
 
     def schema_header(klass)
@@ -24,6 +34,13 @@ module AwesomeAnnotate
         "# Table name: #{klass.table_name}\n",
         "#\n"
       ].join
+    end
+
+    def column_annotations(klass, columns)
+      column_name_width = columns.map { |column| column.name.length }.max || 0
+      column_type_width = columns.map { |column| column_type(column).length }.max || 0
+
+      columns.map { |column| column_annotation(klass, column, column_name_width, column_type_width) }.join
     end
 
     def column_annotation(klass, column, column_name_width, column_type_width)
@@ -44,7 +61,7 @@ module AwesomeAnnotate
       details = []
       details << 'not null' if column.null == false
       details << 'primary key' if column.name == klass.primary_key
-      details << "default(#{column.default.inspect})" unless column.default.nil?
+      details << "default(#{column.default.inspect})" if include_column_defaults? && !column.default.nil?
       details
     end
 

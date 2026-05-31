@@ -15,6 +15,8 @@ module AwesomeAnnotate
       super()
       @env_file_path = Pathname.new(params[:env_file_path] || 'config/environment.rb')
       @route_file_path = Pathname.new(params[:route_file_path] || 'config/routes.rb')
+      @annotation_position = params[:annotation_position] || 'top'
+      @exclude_routes = params[:exclude_routes] || []
     end
 
     desc 'annotate all routes', 'annotate your routes'
@@ -50,7 +52,7 @@ module AwesomeAnnotate
     private
 
     def parse_routes(routes)
-      split_routes = routes.split(/\r\n|\r|\n/)
+      split_routes = routes.split(/\r\n|\r|\n/).reject { |route| excluded_route?(route) }
       parse_routes = split_routes.map do |route|
         "# #{route}\n"
       end
@@ -59,12 +61,17 @@ module AwesomeAnnotate
       parse_routes.join
     end
 
+    def excluded_route?(route)
+      @exclude_routes.any? { |pattern| File.fnmatch?(pattern, route.strip) }
+    end
+
     def insert_file_before_class(file_path, message)
       replace_or_insert_annotation(
         file_path: file_path,
         marker: 'routes',
         content: message,
-        before: "Rails.application.routes.draw do\n"
+        before: "Rails.application.routes.draw do\n",
+        position: @annotation_position
       )
     end
 
