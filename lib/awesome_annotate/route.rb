@@ -36,6 +36,17 @@ module AwesomeAnnotate
       say "annotate routes in #{@route_file_path}"
     end
 
+    desc 'remove', 'remove route annotation'
+    def remove
+      raise 'Route file not found' unless @route_file_path.exist?
+
+      if remove_annotation(file_path: @route_file_path, marker: 'routes')
+        say "remove route annotation in #{@route_file_path}"
+      else
+        say "no route annotation in #{@route_file_path}"
+      end
+    end
+
     private
 
     def parse_routes(routes)
