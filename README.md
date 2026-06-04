@@ -66,6 +66,15 @@ Annotate all models and routes:
 bundle exec awesome_annotate all
 ```
 
+Remove generated annotations:
+
+```sh
+bundle exec awesome_annotate remove model user
+bundle exec awesome_annotate remove models
+bundle exec awesome_annotate remove routes
+bundle exec awesome_annotate remove all
+```
+
 This loads `config/environment.rb`, resolves `User`, reads its Active Record
 columns, and writes a schema block before the class definition in
 `app/models/user.rb`:

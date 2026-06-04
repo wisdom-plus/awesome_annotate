@@ -69,4 +69,19 @@ RSpec.describe AwesomeAnnotate::Route do
       end
     end
   end
+
+  describe '#remove' do
+    it 'removes annotation from routes file' do
+      route_mock(routes_message)
+      expect { annotate_model.annotate }.to output(/annotate routes/).to_stdout
+
+      expect { annotate_model.remove }.to output(%r{remove route annotation in spec/mock/routes\.rb}).to_stdout
+
+      file_content = File.read(route_file_path)
+      expect(file_content).not_to include '# == AwesomeAnnotate: routes'
+      expect(file_content).to include 'Rails.application.routes.draw do'
+    end
+
+    after { file_reset(route_file_path) }
+  end
 end

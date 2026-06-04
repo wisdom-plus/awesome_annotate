@@ -103,4 +103,36 @@ RSpec.describe AwesomeAnnotate::Model do
       end
     end
   end
+
+  describe '#remove' do
+    it 'removes annotation from a model file' do
+      expect { annotate_model.annotate('user') }.to output(/annotate users table columns/).to_stdout
+
+      expect { annotate_model.remove('user') }.to output(%r{remove model annotation in spec/mock/user\.rb}).to_stdout
+
+      file_content = File.read("#{model_dir}/user.rb")
+      expect(file_content).not_to include '# == AwesomeAnnotate: columns'
+      expect(file_content).to include 'class User < ActiveRecord::Base'
+    end
+  end
+
+  describe '#remove_all' do
+    it 'removes annotations from discovered model files' do
+      expect do
+        annotate_model.annotate_all
+      end.to output(/annotate articles table columns.*annotate users table columns/m).to_stdout
+
+      expect do
+        annotate_model.remove_all
+      end.to output(
+        %r{remove model annotation in spec/mock/article\.rb.*remove model annotation in spec/mock/user\.rb}m
+      ).to_stdout
+
+      user_content = File.read("#{model_dir}/user.rb")
+      article_content = File.read("#{model_dir}/article.rb")
+
+      expect(user_content).not_to include '# == AwesomeAnnotate: columns'
+      expect(article_content).not_to include '# == AwesomeAnnotate: columns'
+    end
+  end
 end
