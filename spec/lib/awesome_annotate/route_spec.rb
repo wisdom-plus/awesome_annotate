@@ -34,6 +34,7 @@ RSpec.describe AwesomeAnnotate::Route do
           expect(file_content).to include '# == AwesomeAnnotate: routes'
           expect(file_content).to include '# == /AwesomeAnnotate: routes'
           expect(file_content).to include parse_routes(routes_message)
+          expect(file_content).to include "# == /AwesomeAnnotate: routes\n\nRails.application.routes.draw do"
         end
 
         it 'replaces existing annotate block' do
