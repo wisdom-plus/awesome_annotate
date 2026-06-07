@@ -6,7 +6,7 @@ Gem::Specification.new do |spec|
   spec.name = 'awesome_annotate'
   spec.version = AwesomeAnnotate::VERSION
   spec.authors = ['wisdom-plus']
-  spec.email = ['wisdom.plus.264.dev@gmail.com']
+  spec.email = ['wisdom-plus@users.noreply.github.com']
 
   spec.summary = 'annotate your code with comments'
   spec.description = 'annotate your code with comments (e.g. model schema, routes, etc.)'
