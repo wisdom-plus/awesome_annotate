@@ -9,8 +9,10 @@ module AwesomeAnnotate
     DEFAULT_OPTIONS = {
       env_file_path: 'config/environment.rb',
       model_dir: 'app/models',
-      route_file_path: 'config/routes.rb'
+      route_file_path: 'config/routes.rb',
+      annotation_position: 'top'
     }.freeze
+    ANNOTATION_POSITIONS = %w[top bottom].freeze
 
     TEMPLATE = <<~YAML
       # AwesomeAnnotate configuration
@@ -19,6 +21,7 @@ module AwesomeAnnotate
       env_file_path: config/environment.rb
       model_dir: app/models
       route_file_path: config/routes.rb
+      annotation_position: top
     YAML
 
     class << self
@@ -50,6 +53,15 @@ module AwesomeAnnotate
 
     def initialize(options = {})
       @options = DEFAULT_OPTIONS.merge(options)
+      validate_annotation_position
+    end
+
+    private
+
+    def validate_annotation_position
+      return if ANNOTATION_POSITIONS.include?(@options[:annotation_position])
+
+      raise ArgumentError, "annotation_position must be one of: #{ANNOTATION_POSITIONS.join(', ')}"
     end
   end
 end

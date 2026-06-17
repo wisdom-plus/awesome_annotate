@@ -11,7 +11,8 @@ RSpec.describe AwesomeAnnotate::Configuration do
       expect(config.options).to eq(
         env_file_path: 'config/environment.rb',
         model_dir: 'app/models',
-        route_file_path: 'config/routes.rb'
+        route_file_path: 'config/routes.rb',
+        annotation_position: 'top'
       )
     end
 
@@ -22,6 +23,7 @@ RSpec.describe AwesomeAnnotate::Configuration do
           env_file_path: spec/mock/config.rb
           model_dir: spec/mock
           route_file_path: spec/mock/routes.rb
+          annotation_position: bottom
           unknown_option: ignored
         YAML
 
@@ -30,7 +32,8 @@ RSpec.describe AwesomeAnnotate::Configuration do
         expect(config.options).to eq(
           env_file_path: 'spec/mock/config.rb',
           model_dir: 'spec/mock',
-          route_file_path: 'spec/mock/routes.rb'
+          route_file_path: 'spec/mock/routes.rb',
+          annotation_position: 'bottom'
         )
       end
     end
@@ -46,6 +49,18 @@ RSpec.describe AwesomeAnnotate::Configuration do
         )
       end
     end
+
+    it 'raises when annotation_position is invalid' do
+      Dir.mktmpdir do |dir|
+        path = File.join(dir, 'awesome_annotate.yml')
+        File.write(path, "annotation_position: middle\n")
+
+        expect { described_class.load(path) }.to raise_error(
+          ArgumentError,
+          'annotation_position must be one of: top, bottom'
+        )
+      end
+    end
   end
 
   describe '.create' do
@@ -55,7 +70,7 @@ RSpec.describe AwesomeAnnotate::Configuration do
 
         described_class.create(path)
 
-        expect(File.read(path)).to include('model_dir: app/models')
+        expect(File.read(path)).to include('annotation_position: top')
       end
     end
   end
