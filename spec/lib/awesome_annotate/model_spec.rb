@@ -8,7 +8,14 @@ require 'active_record'
 RSpec.describe AwesomeAnnotate::Model do
   let(:env_file_path) { 'spec/mock/config.rb' }
   let(:model_dir) { 'spec/mock' }
-  let(:annotate_model) { described_class.new(env_file_path: env_file_path, model_dir: model_dir) }
+  let(:annotation_position) { 'top' }
+  let(:annotate_model) do
+    described_class.new(
+      env_file_path: env_file_path,
+      model_dir: model_dir,
+      annotation_position: annotation_position
+    )
+  end
 
   describe '#annotate' do
     context 'when env file path exists' do
@@ -37,6 +44,22 @@ RSpec.describe AwesomeAnnotate::Model do
           expect(file_content.scan('# == AwesomeAnnotate: columns').size).to eq 1
           expect(file_content.scan('# == /AwesomeAnnotate: columns').size).to eq 1
           expect(file_content.scan('# == Schema Information').size).to eq 1
+        end
+
+        context 'when annotation_position is bottom' do
+          let(:annotation_position) { 'bottom' }
+
+          it 'writes the annotation at the bottom of the model file' do
+            expect do
+              annotate_model.annotate('user')
+            end.to output(%r{annotate users table columns in spec/mock/user\.rb}).to_stdout
+
+            file_content = File.read("#{model_dir}/user.rb")
+            class_position = file_content.index('class User < ActiveRecord::Base')
+            annotation_position = file_content.index('# == AwesomeAnnotate: columns')
+            expect(class_position).to be < annotation_position
+            expect(file_content).to end_with("# == /AwesomeAnnotate: columns\n\n")
+          end
         end
 
         after { file_reset("#{model_dir}/user.rb") }

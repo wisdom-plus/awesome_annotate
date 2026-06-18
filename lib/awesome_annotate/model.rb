@@ -18,6 +18,7 @@ module AwesomeAnnotate
       super()
       @env_file_path = Pathname.new(params[:env_file_path] || 'config/environment.rb')
       @model_dir = Pathname.new(params[:model_dir] || 'app/models')
+      @annotation_position = params[:annotation_position] || 'top'
     end
 
     desc 'model [model name]', 'annotate your model'
@@ -108,7 +109,8 @@ module AwesomeAnnotate
         file_path: file_path,
         marker: 'columns',
         content: message,
-        before: /^class\s+\w+\s+<\s+\w+/
+        before: /^class\s+\w+\s+<\s+\w+/,
+        position: @annotation_position
       )
     end
 
