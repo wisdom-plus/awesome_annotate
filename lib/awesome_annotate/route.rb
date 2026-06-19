@@ -15,6 +15,7 @@ module AwesomeAnnotate
       super()
       @env_file_path = Pathname.new(params[:env_file_path] || 'config/environment.rb')
       @route_file_path = Pathname.new(params[:route_file_path] || 'config/routes.rb')
+      @annotation_position = params[:annotation_position] || 'top'
     end
 
     desc 'annotate all routes', 'annotate your routes'
@@ -64,7 +65,8 @@ module AwesomeAnnotate
         file_path: file_path,
         marker: 'routes',
         content: message,
-        before: "Rails.application.routes.draw do\n"
+        before: "Rails.application.routes.draw do\n",
+        position: @annotation_position
       )
     end
 
