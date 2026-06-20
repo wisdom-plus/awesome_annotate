@@ -106,11 +106,14 @@ This creates `config/initializers/awesome_annotate.yml`:
 env_file_path: config/environment.rb
 model_dir: app/models
 route_file_path: config/routes.rb
+annotation_position: top
 ```
 
 When this file exists, annotation and removal commands use these values. This
 allows applications with non-standard model, route, or environment file paths to
-change command behavior without passing Ruby options directly.
+change command behavior without passing Ruby options directly. Set
+`annotation_position` to `top` or `bottom` to choose where new annotation blocks
+are inserted.
 
 This loads `config/environment.rb`, resolves `User`, reads its Active Record
 columns, and writes a schema block before the class definition in
