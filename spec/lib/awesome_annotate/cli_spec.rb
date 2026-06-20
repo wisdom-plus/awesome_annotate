@@ -30,6 +30,7 @@ RSpec.describe AwesomeAnnotate::CLI do
             env_file_path: spec/mock/config.rb
             model_dir: spec/mock
             route_file_path: spec/mock/routes.rb
+            annotation_position: bottom
           YAML
           annotator = instance_double(AwesomeAnnotate::Model, annotate_all: nil)
           allow(AwesomeAnnotate::Model).to receive(:new).and_return(annotator)
@@ -39,7 +40,8 @@ RSpec.describe AwesomeAnnotate::CLI do
           expect(AwesomeAnnotate::Model).to have_received(:new).with(
             env_file_path: 'spec/mock/config.rb',
             model_dir: 'spec/mock',
-            route_file_path: 'spec/mock/routes.rb'
+            route_file_path: 'spec/mock/routes.rb',
+            annotation_position: 'bottom'
           )
         end
       end
@@ -54,7 +56,7 @@ RSpec.describe AwesomeAnnotate::CLI do
             described_class.new.init
           end.to output("create config/initializers/awesome_annotate.yml\n").to_stdout
 
-          expect(File.read('config/initializers/awesome_annotate.yml')).to include('route_file_path: config/routes.rb')
+          expect(File.read('config/initializers/awesome_annotate.yml')).to include('annotation_position: top')
         end
       end
     end
@@ -120,12 +122,14 @@ RSpec.describe AwesomeAnnotate::CLI do
           expect(AwesomeAnnotate::Model).to have_received(:new).with(
             env_file_path: 'config/environment.rb',
             model_dir: 'spec/mock',
-            route_file_path: 'config/routes.rb'
+            route_file_path: 'config/routes.rb',
+            annotation_position: 'top'
           )
           expect(AwesomeAnnotate::Route).to have_received(:new).with(
             env_file_path: 'config/environment.rb',
             model_dir: 'spec/mock',
-            route_file_path: 'config/routes.rb'
+            route_file_path: 'config/routes.rb',
+            annotation_position: 'top'
           )
         end
       end
