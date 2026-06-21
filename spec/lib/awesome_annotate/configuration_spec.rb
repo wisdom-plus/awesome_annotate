@@ -12,7 +12,8 @@ RSpec.describe AwesomeAnnotate::Configuration do
         env_file_path: 'config/environment.rb',
         model_dir: 'app/models',
         route_file_path: 'config/routes.rb',
-        annotation_position: 'top'
+        annotation_position: 'top',
+        exclude_model_files: []
       )
     end
 
@@ -24,6 +25,9 @@ RSpec.describe AwesomeAnnotate::Configuration do
           model_dir: spec/mock
           route_file_path: spec/mock/routes.rb
           annotation_position: bottom
+          exclude_model_files:
+            - article.rb
+            - legacy/*
           unknown_option: ignored
         YAML
 
@@ -33,7 +37,8 @@ RSpec.describe AwesomeAnnotate::Configuration do
           env_file_path: 'spec/mock/config.rb',
           model_dir: 'spec/mock',
           route_file_path: 'spec/mock/routes.rb',
-          annotation_position: 'bottom'
+          annotation_position: 'bottom',
+          exclude_model_files: ['article.rb', 'legacy/*']
         )
       end
     end
@@ -61,6 +66,18 @@ RSpec.describe AwesomeAnnotate::Configuration do
         )
       end
     end
+
+    it 'raises when exclude_model_files is not an array' do
+      Dir.mktmpdir do |dir|
+        path = File.join(dir, 'awesome_annotate.yml')
+        File.write(path, "exclude_model_files: article.rb\n")
+
+        expect { described_class.load(path) }.to raise_error(
+          ArgumentError,
+          'exclude_model_files must be an array'
+        )
+      end
+    end
   end
 
   describe '.create' do
@@ -70,7 +87,9 @@ RSpec.describe AwesomeAnnotate::Configuration do
 
         described_class.create(path)
 
-        expect(File.read(path)).to include('annotation_position: top')
+        content = File.read(path)
+        expect(content).to include('annotation_position: top')
+        expect(content).to include('exclude_model_files: []')
       end
     end
   end

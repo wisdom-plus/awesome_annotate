@@ -10,7 +10,8 @@ module AwesomeAnnotate
       env_file_path: 'config/environment.rb',
       model_dir: 'app/models',
       route_file_path: 'config/routes.rb',
-      annotation_position: 'top'
+      annotation_position: 'top',
+      exclude_model_files: []
     }.freeze
     ANNOTATION_POSITIONS = %w[top bottom].freeze
 
@@ -22,6 +23,7 @@ module AwesomeAnnotate
       model_dir: app/models
       route_file_path: config/routes.rb
       annotation_position: top
+      exclude_model_files: []
     YAML
 
     class << self
@@ -54,6 +56,7 @@ module AwesomeAnnotate
     def initialize(options = {})
       @options = DEFAULT_OPTIONS.merge(options)
       validate_annotation_position
+      validate_exclude_model_files
     end
 
     private
@@ -62,6 +65,12 @@ module AwesomeAnnotate
       return if ANNOTATION_POSITIONS.include?(@options[:annotation_position])
 
       raise ArgumentError, "annotation_position must be one of: #{ANNOTATION_POSITIONS.join(', ')}"
+    end
+
+    def validate_exclude_model_files
+      return if @options[:exclude_model_files].is_a?(Array)
+
+      raise ArgumentError, 'exclude_model_files must be an array'
     end
   end
 end
