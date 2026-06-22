@@ -9,11 +9,13 @@ RSpec.describe AwesomeAnnotate::Model do
   let(:env_file_path) { 'spec/mock/config.rb' }
   let(:model_dir) { 'spec/mock' }
   let(:annotation_position) { 'top' }
+  let(:exclude_model_files) { [] }
   let(:annotate_model) do
     described_class.new(
       env_file_path: env_file_path,
       model_dir: model_dir,
-      annotation_position: annotation_position
+      annotation_position: annotation_position,
+      exclude_model_files: exclude_model_files
     )
   end
 
@@ -124,6 +126,24 @@ RSpec.describe AwesomeAnnotate::Model do
       after do
         file_reset("#{model_dir}/user.rb")
         file_reset("#{model_dir}/article.rb")
+      end
+
+      context 'when exclude_model_files is set' do
+        let(:exclude_model_files) { ['article.rb'] }
+
+        it 'skips excluded model files during discovery' do
+          expect do
+            annotate_model.annotate_all
+          end.to output(/annotate users table columns/).to_stdout
+
+          user_content = File.read("#{model_dir}/user.rb")
+          article_content = File.read("#{model_dir}/article.rb")
+
+          expect(user_content).to include '# Table name: users'
+          expect(article_content).not_to include '# == AwesomeAnnotate: columns'
+        end
+
+        after { file_reset("#{model_dir}/user.rb") }
       end
     end
   end

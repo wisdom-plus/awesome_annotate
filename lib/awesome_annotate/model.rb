@@ -19,6 +19,7 @@ module AwesomeAnnotate
       @env_file_path = Pathname.new(params[:env_file_path] || 'config/environment.rb')
       @model_dir = Pathname.new(params[:model_dir] || 'app/models')
       @annotation_position = params[:annotation_position] || 'top'
+      @exclude_model_files = params[:exclude_model_files] || []
     end
 
     desc 'model [model name]', 'annotate your model'
@@ -87,7 +88,12 @@ module AwesomeAnnotate
     def excluded_model_file?(file_path)
       relative_path = Pathname.new(file_path).relative_path_from(@model_dir).to_s
 
-      relative_path == 'application_record.rb' || relative_path.start_with?('concerns/')
+      relative_path == 'application_record.rb' || relative_path.start_with?('concerns/') ||
+        excluded_by_config?(relative_path)
+    end
+
+    def excluded_by_config?(relative_path)
+      @exclude_model_files.any? { |pattern| File.fnmatch?(pattern, relative_path, File::FNM_PATHNAME) }
     end
 
     def annotate_discovered_model(model_name)
@@ -105,13 +111,8 @@ module AwesomeAnnotate
     end
 
     def insert_file_before_class(file_path, message)
-      replace_or_insert_annotation(
-        file_path: file_path,
-        marker: 'columns',
-        content: message,
-        before: /^class\s+\w+\s+<\s+\w+/,
-        position: @annotation_position
-      )
+      replace_or_insert_annotation(file_path: file_path, marker: 'columns', content: message,
+                                   before: /^class\s+\w+\s+<\s+\w+/, position: @annotation_position)
     end
 
     def model_file_path(model_name)
@@ -133,9 +134,8 @@ module AwesomeAnnotate
       raise AwesomeAnnotate::NotFoundError
     end
 
-    def self.source_root
-      Dir.pwd
-    end
+    def self.source_root = Dir.pwd
+
     private_class_method :source_root
   end
 end
