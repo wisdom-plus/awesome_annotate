@@ -13,7 +13,8 @@ RSpec.describe AwesomeAnnotate::Configuration do
         model_dir: 'app/models',
         route_file_path: 'config/routes.rb',
         annotation_position: 'top',
-        exclude_model_files: []
+        exclude_model_files: [],
+        include_indexes: true
       )
     end
 
@@ -28,6 +29,7 @@ RSpec.describe AwesomeAnnotate::Configuration do
           exclude_model_files:
             - article.rb
             - legacy/*
+          include_indexes: false
           unknown_option: ignored
         YAML
 
@@ -38,7 +40,8 @@ RSpec.describe AwesomeAnnotate::Configuration do
           model_dir: 'spec/mock',
           route_file_path: 'spec/mock/routes.rb',
           annotation_position: 'bottom',
-          exclude_model_files: ['article.rb', 'legacy/*']
+          exclude_model_files: ['article.rb', 'legacy/*'],
+          include_indexes: false
         )
       end
     end
@@ -78,6 +81,18 @@ RSpec.describe AwesomeAnnotate::Configuration do
         )
       end
     end
+
+    it 'raises when include_indexes is not a boolean' do
+      Dir.mktmpdir do |dir|
+        path = File.join(dir, 'awesome_annotate.yml')
+        File.write(path, "include_indexes: maybe\n")
+
+        expect { described_class.load(path) }.to raise_error(
+          ArgumentError,
+          'include_indexes must be true or false'
+        )
+      end
+    end
   end
 
   describe '.create' do
@@ -90,6 +105,7 @@ RSpec.describe AwesomeAnnotate::Configuration do
         content = File.read(path)
         expect(content).to include('annotation_position: top')
         expect(content).to include('exclude_model_files: []')
+        expect(content).to include('include_indexes: true')
       end
     end
   end
