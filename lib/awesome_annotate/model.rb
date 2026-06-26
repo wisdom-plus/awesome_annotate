@@ -20,6 +20,7 @@ module AwesomeAnnotate
       @model_dir = Pathname.new(params[:model_dir] || 'app/models')
       @annotation_position = params[:annotation_position] || 'top'
       @exclude_model_files = params[:exclude_model_files] || []
+      @include_indexes = params.fetch(:include_indexes, true)
     end
 
     desc 'model [model name]', 'annotate your model'

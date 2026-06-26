@@ -64,6 +64,29 @@ RSpec.describe AwesomeAnnotate::Model do
           end
         end
 
+        context 'when include_indexes is false' do
+          let(:annotate_model) do
+            described_class.new(
+              env_file_path: env_file_path,
+              model_dir: model_dir,
+              annotation_position: annotation_position,
+              exclude_model_files: exclude_model_files,
+              include_indexes: false
+            )
+          end
+
+          it 'does not write index annotations' do
+            expect do
+              annotate_model.annotate('user')
+            end.to output(%r{annotate users table columns in spec/mock/user\.rb}).to_stdout
+
+            file_content = File.read("#{model_dir}/user.rb")
+            expect(file_content).to include '#  email      :string   not null, default("")'
+            expect(file_content).not_to include '# Indexes'
+            expect(file_content).not_to include '#  (email)       UNIQUE, index_users_on_email'
+          end
+        end
+
         after { file_reset("#{model_dir}/user.rb") }
       end
 
