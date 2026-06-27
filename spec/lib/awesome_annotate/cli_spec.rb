@@ -33,6 +33,7 @@ RSpec.describe AwesomeAnnotate::CLI do
             annotation_position: bottom
             exclude_model_files:
               - article.rb
+            include_indexes: false
           YAML
           annotator = instance_double(AwesomeAnnotate::Model, annotate_all: nil)
           allow(AwesomeAnnotate::Model).to receive(:new).and_return(annotator)
@@ -44,7 +45,8 @@ RSpec.describe AwesomeAnnotate::CLI do
             model_dir: 'spec/mock',
             route_file_path: 'spec/mock/routes.rb',
             annotation_position: 'bottom',
-            exclude_model_files: ['article.rb']
+            exclude_model_files: ['article.rb'],
+            include_indexes: false
           )
         end
       end
@@ -59,7 +61,7 @@ RSpec.describe AwesomeAnnotate::CLI do
             described_class.new.init
           end.to output("create config/initializers/awesome_annotate.yml\n").to_stdout
 
-          expect(File.read('config/initializers/awesome_annotate.yml')).to include('exclude_model_files: []')
+          expect(File.read('config/initializers/awesome_annotate.yml')).to include('include_indexes: true')
         end
       end
     end
@@ -127,14 +129,16 @@ RSpec.describe AwesomeAnnotate::CLI do
             model_dir: 'spec/mock',
             route_file_path: 'config/routes.rb',
             annotation_position: 'top',
-            exclude_model_files: []
+            exclude_model_files: [],
+            include_indexes: true
           )
           expect(AwesomeAnnotate::Route).to have_received(:new).with(
             env_file_path: 'config/environment.rb',
             model_dir: 'spec/mock',
             route_file_path: 'config/routes.rb',
             annotation_position: 'top',
-            exclude_model_files: []
+            exclude_model_files: [],
+            include_indexes: true
           )
         end
       end

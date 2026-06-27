@@ -6,15 +6,17 @@ module AwesomeAnnotate
 
     def schema_annotation(klass)
       columns = klass.columns
-      column_name_width = columns.map { |column| column.name.length }.max || 0
-      column_type_width = columns.map { |column| column_type(column).length }.max || 0
 
       [
         schema_header(klass),
-        columns.map { |column| column_annotation(klass, column, column_name_width, column_type_width) }.join,
-        index_annotations(klass),
+        column_annotations(klass, columns),
+        include_indexes? ? index_annotations(klass) : '',
         "#\n"
       ].join
+    end
+
+    def include_indexes?
+      @include_indexes != false
     end
 
     def schema_header(klass)
@@ -24,6 +26,13 @@ module AwesomeAnnotate
         "# Table name: #{klass.table_name}\n",
         "#\n"
       ].join
+    end
+
+    def column_annotations(klass, columns)
+      column_name_width = columns.map { |column| column.name.length }.max || 0
+      column_type_width = columns.map { |column| column_type(column).length }.max || 0
+
+      columns.map { |column| column_annotation(klass, column, column_name_width, column_type_width) }.join
     end
 
     def column_annotation(klass, column, column_name_width, column_type_width)
