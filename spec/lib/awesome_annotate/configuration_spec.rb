@@ -14,7 +14,8 @@ RSpec.describe AwesomeAnnotate::Configuration do
         route_file_path: 'config/routes.rb',
         annotation_position: 'top',
         exclude_model_files: [],
-        include_indexes: true
+        include_indexes: true,
+        exclude_columns: []
       )
     end
 
@@ -30,6 +31,9 @@ RSpec.describe AwesomeAnnotate::Configuration do
             - article.rb
             - legacy/*
           include_indexes: false
+          exclude_columns:
+            - encrypted_password
+            - reset_password_token
           unknown_option: ignored
         YAML
 
@@ -41,7 +45,8 @@ RSpec.describe AwesomeAnnotate::Configuration do
           route_file_path: 'spec/mock/routes.rb',
           annotation_position: 'bottom',
           exclude_model_files: ['article.rb', 'legacy/*'],
-          include_indexes: false
+          include_indexes: false,
+          exclude_columns: %w[encrypted_password reset_password_token]
         )
       end
     end
@@ -93,6 +98,18 @@ RSpec.describe AwesomeAnnotate::Configuration do
         )
       end
     end
+
+    it 'raises when exclude_columns is not an array' do
+      Dir.mktmpdir do |dir|
+        path = File.join(dir, 'awesome_annotate.yml')
+        File.write(path, "exclude_columns: encrypted_password\n")
+
+        expect { described_class.load(path) }.to raise_error(
+          ArgumentError,
+          'exclude_columns must be an array'
+        )
+      end
+    end
   end
 
   describe '.create' do
@@ -106,6 +123,7 @@ RSpec.describe AwesomeAnnotate::Configuration do
         expect(content).to include('annotation_position: top')
         expect(content).to include('exclude_model_files: []')
         expect(content).to include('include_indexes: true')
+        expect(content).to include('exclude_columns: []')
       end
     end
   end

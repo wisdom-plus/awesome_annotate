@@ -12,7 +12,8 @@ module AwesomeAnnotate
       route_file_path: 'config/routes.rb',
       annotation_position: 'top',
       exclude_model_files: [],
-      include_indexes: true
+      include_indexes: true,
+      exclude_columns: []
     }.freeze
     ANNOTATION_POSITIONS = %w[top bottom].freeze
 
@@ -26,6 +27,7 @@ module AwesomeAnnotate
       annotation_position: top
       exclude_model_files: []
       include_indexes: true
+      exclude_columns: []
     YAML
 
     class << self
@@ -60,6 +62,7 @@ module AwesomeAnnotate
       validate_annotation_position
       validate_exclude_model_files
       validate_include_indexes
+      validate_exclude_columns
     end
 
     private
@@ -80,6 +83,12 @@ module AwesomeAnnotate
       return if [true, false].include?(@options[:include_indexes])
 
       raise ArgumentError, 'include_indexes must be true or false'
+    end
+
+    def validate_exclude_columns
+      return if @options[:exclude_columns].is_a?(Array)
+
+      raise ArgumentError, 'exclude_columns must be an array'
     end
   end
 end
