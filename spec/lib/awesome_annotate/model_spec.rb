@@ -87,6 +87,28 @@ RSpec.describe AwesomeAnnotate::Model do
           end
         end
 
+        context 'when exclude_columns is set' do
+          let(:annotate_model) do
+            described_class.new(
+              env_file_path: env_file_path,
+              model_dir: model_dir,
+              annotation_position: annotation_position,
+              exclude_model_files: exclude_model_files,
+              exclude_columns: ['email']
+            )
+          end
+
+          it 'does not write excluded columns' do
+            expect do
+              annotate_model.annotate('user')
+            end.to output(%r{annotate users table columns in spec/mock/user\.rb}).to_stdout
+
+            file_content = File.read("#{model_dir}/user.rb")
+            expect(file_content).to include '#  id         :integer  not null, primary key'
+            expect(file_content).not_to include '#  email'
+          end
+        end
+
         after { file_reset("#{model_dir}/user.rb") }
       end
 

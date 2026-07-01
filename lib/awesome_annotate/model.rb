@@ -21,6 +21,7 @@ module AwesomeAnnotate
       @annotation_position = params[:annotation_position] || 'top'
       @exclude_model_files = params[:exclude_model_files] || []
       @include_indexes = params.fetch(:include_indexes, true)
+      @exclude_columns = params[:exclude_columns] || []
     end
 
     desc 'model [model name]', 'annotate your model'
