@@ -5,7 +5,7 @@ module AwesomeAnnotate
     private
 
     def schema_annotation(klass)
-      columns = klass.columns
+      columns = schema_columns(klass)
 
       [
         schema_header(klass),
@@ -17,6 +17,10 @@ module AwesomeAnnotate
 
     def include_indexes?
       @include_indexes != false
+    end
+
+    def schema_columns(klass)
+      klass.columns.reject { |column| @exclude_columns.include?(column.name) }
     end
 
     def schema_header(klass)
