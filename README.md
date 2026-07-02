@@ -109,6 +109,7 @@ route_file_path: config/routes.rb
 annotation_position: top
 exclude_model_files: []
 include_indexes: true
+exclude_columns: []
 ```
 
 When this file exists, annotation and removal commands use these values. This
@@ -117,7 +118,8 @@ change command behavior without passing Ruby options directly. Set
 `annotation_position` to `top` or `bottom` to choose where new annotation blocks
 are inserted. Set `exclude_model_files` to relative file paths or glob patterns
 under `model_dir` to skip them during model discovery. Set `include_indexes` to
-`false` to omit the Indexes section from model schema annotations.
+`false` to omit the Indexes section from model schema annotations. Set
+`exclude_columns` to column names to omit them from model schema annotations.
 
 This loads `config/environment.rb`, resolves `User`, reads its Active Record
 columns, and writes a schema block before the class definition in
