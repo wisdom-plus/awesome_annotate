@@ -13,7 +13,8 @@ module AwesomeAnnotate
       annotation_position: 'top',
       exclude_model_files: [],
       include_indexes: true,
-      exclude_columns: []
+      exclude_columns: [],
+      include_column_defaults: true
     }.freeze
     ANNOTATION_POSITIONS = %w[top bottom].freeze
 
@@ -28,6 +29,7 @@ module AwesomeAnnotate
       exclude_model_files: []
       include_indexes: true
       exclude_columns: []
+      include_column_defaults: true
     YAML
 
     class << self
@@ -63,6 +65,7 @@ module AwesomeAnnotate
       validate_exclude_model_files
       validate_include_indexes
       validate_exclude_columns
+      validate_include_column_defaults
     end
 
     private
@@ -89,6 +92,12 @@ module AwesomeAnnotate
       return if @options[:exclude_columns].is_a?(Array)
 
       raise ArgumentError, 'exclude_columns must be an array'
+    end
+
+    def validate_include_column_defaults
+      return if [true, false].include?(@options[:include_column_defaults])
+
+      raise ArgumentError, 'include_column_defaults must be true or false'
     end
   end
 end

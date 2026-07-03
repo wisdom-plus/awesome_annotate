@@ -15,7 +15,8 @@ RSpec.describe AwesomeAnnotate::Configuration do
         annotation_position: 'top',
         exclude_model_files: [],
         include_indexes: true,
-        exclude_columns: []
+        exclude_columns: [],
+        include_column_defaults: true
       )
     end
 
@@ -34,6 +35,7 @@ RSpec.describe AwesomeAnnotate::Configuration do
           exclude_columns:
             - encrypted_password
             - reset_password_token
+          include_column_defaults: false
           unknown_option: ignored
         YAML
 
@@ -46,7 +48,8 @@ RSpec.describe AwesomeAnnotate::Configuration do
           annotation_position: 'bottom',
           exclude_model_files: ['article.rb', 'legacy/*'],
           include_indexes: false,
-          exclude_columns: %w[encrypted_password reset_password_token]
+          exclude_columns: %w[encrypted_password reset_password_token],
+          include_column_defaults: false
         )
       end
     end
@@ -110,6 +113,18 @@ RSpec.describe AwesomeAnnotate::Configuration do
         )
       end
     end
+
+    it 'raises when include_column_defaults is not a boolean' do
+      Dir.mktmpdir do |dir|
+        path = File.join(dir, 'awesome_annotate.yml')
+        File.write(path, "include_column_defaults: maybe\n")
+
+        expect { described_class.load(path) }.to raise_error(
+          ArgumentError,
+          'include_column_defaults must be true or false'
+        )
+      end
+    end
   end
 
   describe '.create' do
@@ -124,6 +139,7 @@ RSpec.describe AwesomeAnnotate::Configuration do
         expect(content).to include('exclude_model_files: []')
         expect(content).to include('include_indexes: true')
         expect(content).to include('exclude_columns: []')
+        expect(content).to include('include_column_defaults: true')
       end
     end
   end
