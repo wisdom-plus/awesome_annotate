@@ -22,6 +22,7 @@ module AwesomeAnnotate
       @exclude_model_files = params[:exclude_model_files] || []
       @include_indexes = params.fetch(:include_indexes, true)
       @exclude_columns = params[:exclude_columns] || []
+      @include_column_defaults = params.fetch(:include_column_defaults, true)
     end
 
     desc 'model [model name]', 'annotate your model'
@@ -79,9 +80,7 @@ module AwesomeAnnotate
       discovered_model_file_paths.map { |file_path| model_name_from_file_path(file_path) }
     end
 
-    def discovered_model_file_paths
-      Dir.glob(@model_dir.join('**/*.rb')).reject { |file_path| excluded_model_file?(file_path) }
-    end
+    def discovered_model_file_paths = Dir.glob(@model_dir.join('**/*.rb')).reject { |path| excluded_model_file?(path) }
 
     def model_name_from_file_path(file_path)
       Pathname.new(file_path).relative_path_from(@model_dir).sub_ext('').to_s
