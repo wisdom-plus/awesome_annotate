@@ -19,6 +19,10 @@ module AwesomeAnnotate
       @include_indexes != false
     end
 
+    def include_column_defaults?
+      @include_column_defaults != false
+    end
+
     def schema_columns(klass)
       klass.columns.reject { |column| @exclude_columns.include?(column.name) }
     end
@@ -57,7 +61,7 @@ module AwesomeAnnotate
       details = []
       details << 'not null' if column.null == false
       details << 'primary key' if column.name == klass.primary_key
-      details << "default(#{column.default.inspect})" unless column.default.nil?
+      details << "default(#{column.default.inspect})" if include_column_defaults? && !column.default.nil?
       details
     end
 
