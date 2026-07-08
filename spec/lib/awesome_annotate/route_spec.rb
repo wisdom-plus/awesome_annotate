@@ -67,6 +67,26 @@ RSpec.describe AwesomeAnnotate::Route do
           end
         end
 
+        context 'when exclude_routes is set' do
+          let(:annotate_model) do
+            described_class.new(
+              env_file_path: env_file_path,
+              route_file_path: route_file_path,
+              annotation_position: annotation_position,
+              exclude_routes: ['*private_policy*']
+            )
+          end
+
+          it 'does not write excluded route lines' do
+            expect { annotate_model.annotate }.to output(%r{annotate routes in spec/mock/routes\.rb}).to_stdout
+
+            file_content = File.read(route_file_path)
+            expect(file_content).to include 'home#top'
+            expect(file_content).to include 'home#policy'
+            expect(file_content).not_to include 'home#private_policy'
+          end
+        end
+
         after { file_reset(route_file_path) }
       end
 
