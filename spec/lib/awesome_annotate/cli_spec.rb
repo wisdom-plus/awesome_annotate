@@ -37,6 +37,8 @@ RSpec.describe AwesomeAnnotate::CLI do
             exclude_columns:
               - email
             include_column_defaults: false
+            exclude_routes:
+              - '*private_policy*'
           YAML
           annotator = instance_double(AwesomeAnnotate::Model, annotate_all: nil)
           allow(AwesomeAnnotate::Model).to receive(:new).and_return(annotator)
@@ -51,7 +53,8 @@ RSpec.describe AwesomeAnnotate::CLI do
             exclude_model_files: ['article.rb'],
             include_indexes: false,
             exclude_columns: ['email'],
-            include_column_defaults: false
+            include_column_defaults: false,
+            exclude_routes: ['*private_policy*']
           )
         end
       end
@@ -67,7 +70,7 @@ RSpec.describe AwesomeAnnotate::CLI do
           end.to output("create config/initializers/awesome_annotate.yml\n").to_stdout
 
           expect(File.read('config/initializers/awesome_annotate.yml')).to include(
-            'include_column_defaults: true'
+            'exclude_routes: []'
           )
         end
       end
@@ -139,7 +142,8 @@ RSpec.describe AwesomeAnnotate::CLI do
             exclude_model_files: [],
             include_indexes: true,
             exclude_columns: [],
-            include_column_defaults: true
+            include_column_defaults: true,
+            exclude_routes: []
           )
           expect(AwesomeAnnotate::Route).to have_received(:new).with(
             env_file_path: 'config/environment.rb',
@@ -149,7 +153,8 @@ RSpec.describe AwesomeAnnotate::CLI do
             exclude_model_files: [],
             include_indexes: true,
             exclude_columns: [],
-            include_column_defaults: true
+            include_column_defaults: true,
+            exclude_routes: []
           )
         end
       end
