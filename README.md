@@ -111,6 +111,7 @@ exclude_model_files: []
 include_indexes: true
 exclude_columns: []
 include_column_defaults: true
+exclude_routes: []
 ```
 
 When this file exists, annotation and removal commands use these values. This
@@ -121,7 +122,8 @@ are inserted. Set `exclude_model_files` to relative file paths or glob patterns
 under `model_dir` to skip them during model discovery. Set `include_indexes` to
 `false` to omit the Indexes section from model schema annotations. Set
 `exclude_columns` to column names to omit them from model schema annotations. Set
-`include_column_defaults` to `false` to omit `default(...)` details.
+`include_column_defaults` to `false` to omit `default(...)` details. Set
+`exclude_routes` to route line patterns to omit them from route annotations.
 
 This loads `config/environment.rb`, resolves `User`, reads its Active Record
 columns, and writes a schema block before the class definition in
