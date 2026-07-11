@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.3.0] - 2026-05-31
+
+- Added `awesome_annotate init` to create
+  `config/initializers/awesome_annotate.yml`.
+- Added configuration loading for annotation and remove commands.
+- Added path configuration:
+  - `env_file_path`
+  - `model_dir`
+  - `route_file_path`
+- Added `annotation_position` to choose whether new annotation blocks are
+  inserted at the top or bottom of files.
+- Added model annotation filters and output controls:
+  - `exclude_model_files`
+  - `include_indexes`
+  - `exclude_columns`
+  - `include_column_defaults`
+- Added `exclude_routes` to omit matching route lines from route annotations.
+- Added validation for supported configuration value types.
+
 ## [0.2.0] - 2026-05-10
 
 - Added model schema annotations with column type, nullability, primary key,
