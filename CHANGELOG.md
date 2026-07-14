@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.1] - 2026-05-31
+
+- Fixed a bug
+
+## [0.1.0] - 2024-04-29
+
+- Initial release
+
 ## [0.3.0] - 2026-05-31
 
 - Added `awesome_annotate init` to create
